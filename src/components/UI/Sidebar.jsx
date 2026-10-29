@@ -121,12 +121,9 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
             transition={{ duration: 0.3 }}
             className={`relative z-20 flex h-full w-full shrink-0 flex-col border-r ${bg} ${border} md:w-[340px] lg:w-[380px]`}
         >
-            <div className={`flex items-center justify-between border-b px-4 py-4 ${border}`}>
+            <div className={`flex items-center justify-between px-5 pb-3 pt-5`}>
                 <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-indigo-300/15 bg-gradient-to-br from-indigo-400/20 to-sky-400/10">
-                        <MessageSquare size={15} className="text-blue-400" />
-                    </div>
-                    <span className={`text-base font-semibold tracking-tight ${dark ? 'text-white' : 'text-gray-900'}`}>We-Convo<span className="text-indigo-400">.</span></span>
+                    <span className={`text-[23px] font-semibold tracking-tight ${dark ? 'text-white' : 'text-[#008f69]'}`}>We-Convo</span>
                 </div>
                 <div className="flex items-center gap-0.5">
                     {[
