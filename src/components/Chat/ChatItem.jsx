@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import AvatarText from '../miscellaneous/AvatarText';
-import { CheckCheck } from 'lucide-react';
+import { CheckCheck, Star } from 'lucide-react';
 
 const idOf = (value) => value == null ? '' : String(value._id ?? value);
 
-export default function ChatItem({ chat }) {
+export default function ChatItem({ chat, isFavorite = false, onToggleFavorite }) {
     const navigateTo = useNavigate();
     const dark = useSelector((state) => state.theme.dark);
     const onlineUsers = useSelector((state) => state.online);
@@ -42,7 +42,7 @@ export default function ChatItem({ chat }) {
                     navigateTo(`chat/${encodeURIComponent(name)}/${chat._id}/${recipientId}`);
                 }
             }}
-            className={`flex items-center gap-3 px-3 py-3 cursor-pointer border-b transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400
+            className={`group flex items-center gap-3 px-4 py-3 cursor-pointer border-b transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400
                 ${dark ? 'border-[#1a1f2e] hover:bg-white/[0.03]' : 'border-gray-100 hover:bg-gray-50'}`}
         >
             <div className="relative flex-shrink-0">
@@ -68,6 +68,7 @@ export default function ChatItem({ chat }) {
                     {isUnread && <span aria-label="Unread message" className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 ml-2" />}
                 </div>
             </div>
+            <button type="button" title={isFavorite ? 'Remove from favorites' : 'Add to favorites'} aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'} onClick={(event) => { event.stopPropagation(); onToggleFavorite?.(); }} className={`rounded-full p-1.5 transition-opacity ${isFavorite ? 'text-amber-500 opacity-100' : 'text-gray-400 opacity-0 group-hover:opacity-100 hover:text-amber-500'}`}><Star size={14} fill={isFavorite ? 'currentColor' : 'none'} /></button>
         </motion.div>
     );
 }
