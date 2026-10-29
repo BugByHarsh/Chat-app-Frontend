@@ -49,12 +49,20 @@ export default function ChatArea() {
     const [initialLoading, setInitialLoading] = useState(true);
 
     const [messageText, setMessageText] = useState("");
+    const [sending, setSending] = useState(false);
+    const [sendError, setSendError] = useState("");
+    const [loadError, setLoadError] = useState("");
     const [weTyping, setWeTyping] = useState(false);
     const [HeTyping, setHeTyping] = useState(false);
     const timer = useRef(null);
 
     const onlineUsers = useSelector((state) => state.online);
-    const isOnline = onlineUsers.includes(data.Rid);
+    const isOnline = onlineUsers.some((id) => String(id?._id ?? id) === String(data.Rid));
+    const currentUserId = String(safeGetUser()?._id ?? "");
+
+    function idOf(value) {
+        return value == null ? "" : String(value._id ?? value);
+    }
 
     function safeGetUser() {
         try { return JSON.parse(localStorage.getItem("userData")); } catch { return null; }
@@ -78,20 +86,25 @@ export default function ChatArea() {
         setMsgs([]);
         setHasMore(false);
         setInitialLoading(true);
+        setLoadError("");
 
-        socket.emit("msgsRead", {
-            chatId: data.id, Rid: data.Rid, userId: safeGetUser()?._id
-        });
-        dispatch(chatActions.updateRead(data.id));
+        socket.emit("msgsRead", { chatId: data.id });
+        dispatch(chatActions.markChatRead({ chatId: data.id, userId: currentUserId }));
 
+        let cancelled = false;
         fetchMessages(data.id).then(({ messages, hasMore }) => {
-            setMsgs(messages);        // newest-first from backend
+            if (cancelled) return;
+            setMsgs(messages);
             setHasMore(hasMore);
             setInitialLoading(false);
-            // Scroll to bottom after first paint
-            setTimeout(() => scrollToBottom(), 50);
-        }).catch(() => setInitialLoading(false));
-    }, [data.id]);
+            requestAnimationFrame(() => scrollToBottom());
+        }).catch(() => {
+            if (cancelled) return;
+            setLoadError("Couldn't load this conversation. Check your connection and try again.");
+            setInitialLoading(false);
+        });
+        return () => { cancelled = true; };
+    }, [data.id, data.Rid, currentUserId, dispatch, fetchMessages]);
 
     // Load older messages (triggered by scrolling to top)
     async function loadMore() {
@@ -114,7 +127,9 @@ export default function ChatArea() {
                     container.scrollTop = container.scrollHeight - prevHeight;
                 }
             });
-        } catch (_) {}
+        } catch (_) {
+            // Keep the existing messages and cursor so the user can retry by scrolling up again.
+        }
         setLoadingMore(false);
     }
 
@@ -124,20 +139,20 @@ export default function ChatArea() {
         const onTyping = (id) => { if (data.id === id) setHeTyping(true); };
         const onStoppedTyping = (id) => { if (data.id === id) setHeTyping(false); };
         const onNewMessage = (newMsg) => {
-            if (newMsg.chatId !== data.id) return;
-            dispatch(chatActions.updateRead(data.id));
-            socket.emit("msgsRead", {
-                chatId: data.id, Rid: data.Rid, userId: safeGetUser()?._id
-            });
+            if (idOf(newMsg.chatId) !== idOf(data.id)) return;
+            const currentId = String(safeGetUser()?._id ?? "");
+            const visibleMessage = idOf(newMsg.sender) !== currentId ? { ...newMsg, isRead: true } : newMsg;
+            dispatch(chatActions.markChatRead({ chatId: data.id, userId: currentId }));
+            socket.emit("msgsRead", { chatId: data.id });
             setHeTyping(false);
-            setMsgs(prev => [newMsg, ...prev]); // prepend — newest-first
-            setTimeout(() => scrollToBottom(), 30);
+            setMsgs(prev => prev.some((message) => idOf(message._id) === idOf(visibleMessage._id)) ? prev : [visibleMessage, ...prev]);
+            requestAnimationFrame(() => scrollToBottom());
         };
         const onMarkRead = (id) => {
-            dispatch(chatActions.updateRead(data.id));
-            if (data.id === id) {
-                setMsgs(prev => prev.map(m => ({ ...m, isRead: true })));
-            }
+            if (idOf(data.id) !== idOf(id)) return;
+            const currentId = String(safeGetUser()?._id ?? "");
+            dispatch(chatActions.markLatestMessageRead({ chatId: data.id, userId: currentId }));
+            setMsgs(prev => prev.map((message) => idOf(message.sender) === currentId ? { ...message, isRead: true } : message));
         };
 
         socket.on("markRead", onMarkRead);
@@ -157,9 +172,10 @@ export default function ChatArea() {
     // ── Send ─────────────────────────────────────────────────────────────────
 
     async function handleSendMessage() {
-        if (!messageText.trim()) return;
-        const text = messageText;
-        setMessageText("");
+        const text = messageText.trim();
+        if (!text || sending) return;
+        setSending(true);
+        setSendError("");
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/msg`,
@@ -168,14 +184,21 @@ export default function ChatArea() {
             );
             if (response.status === 200) {
                 dispatch(chatActions.updateChat(response.data));
-                setMsgs(prev => [response.data, ...prev]);
-                setTimeout(() => scrollToBottom(), 30);
+                setMsgs(prev => prev.some((message) => idOf(message._id) === idOf(response.data._id)) ? prev : [response.data, ...prev]);
+                setMessageText((current) => current.trim() === text ? "" : current);
+                setSendError("");
+                requestAnimationFrame(() => scrollToBottom());
             }
-        } catch (_) {}
+        } catch (error) {
+            setSendError(error.response?.data?.message || "Couldn't send the message. Your text is still here—please try again.");
+        } finally {
+            setSending(false);
+        }
     }
 
     function handleTyping(e) {
         setMessageText(e.target.value);
+        if (sendError) setSendError("");
         if (!weTyping) {
             setWeTyping(true);
             socket.emit("isTyping", { chatId: data.id, Rid: data.Rid });
@@ -225,7 +248,7 @@ export default function ChatArea() {
             variants={{ initial: { x: 15, opacity: 0 }, fadein: { x: 0, opacity: 1 }, fadeOut: { x: 15, opacity: 0 } }}
             transition={{ duration: 0.3 }}
             animate={controls}
-            className={`flex flex-col h-[100dvh] flex-grow sm:absolute sm:top-0 sm:w-full lg:static ${dark ? "bg-[#0d0f14]" : "bg-gray-50"}`}
+            className={`relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${dark ? "bg-[#0d0f14]" : "bg-gray-50"}`}
         >
             {/* Header */}
             <div className={`flex items-center justify-between border-b px-5 py-4 shadow-sm ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
@@ -268,6 +291,11 @@ export default function ChatArea() {
                                 <Loader2 size={16} className={`animate-spin ${dark ? "text-gray-600" : "text-gray-400"}`} />
                             </div>
                         )}
+                        {loadError && (
+                            <div role="alert" className="mx-4 my-3 rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-center text-xs text-red-400">
+                                {loadError} <button className="ml-1 underline underline-offset-2" onClick={() => { setInitialLoading(true); setLoadError(""); fetchMessages(data.id).then(({ messages, hasMore: more }) => { setMsgs(messages); setHasMore(more); setInitialLoading(false); requestAnimationFrame(() => scrollToBottom()); }).catch(() => { setLoadError("Couldn't load this conversation. Please try again."); setInitialLoading(false); }); }}>Retry</button>
+                            </div>
+                        )}
                         {!hasMore && msgs.length > 0 && (
                             <p className={`text-center text-xs py-4 ${dark ? "text-gray-700" : "text-gray-400"}`}>
                                 Beginning of conversation
@@ -299,10 +327,10 @@ export default function ChatArea() {
                                                     {item.label}
                                                 </span>
                                             </div>
-                                        ) : item.msg.sender.name === data.name ? (
-                                            <Recv msg={item.msg} />
-                                        ) : (
+                                        ) : idOf(item.msg.sender) === currentUserId ? (
                                             <Sent msg={item.msg} />
+                                        ) : (
+                                            <Recv msg={item.msg} />
                                         )}
                                     </div>
                                 );
@@ -313,12 +341,15 @@ export default function ChatArea() {
             </div>
 
             {/* Input */}
-            <div className={`flex items-center gap-3 border-t px-4 py-4 sm:px-6 ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
+            <div className={`border-t px-4 py-3 sm:px-6 ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
+                {sendError && <p role="alert" className="mb-2 text-xs text-red-400">{sendError}</p>}
+                <div className="flex items-center gap-3">
                 <input
                     type="text"
                     value={messageText}
                     autoFocus
-                    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
+                    disabled={sending}
                     onChange={handleTyping}
                     placeholder="Message…"
                     className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10
@@ -329,11 +360,12 @@ export default function ChatArea() {
                 />
                 <button
                     onClick={handleSendMessage}
-                    disabled={!messageText.trim()}
+                    disabled={!messageText.trim() || sending}
                     className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-950/30 transition-all hover:from-indigo-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                    <Send size={15} className="text-white" />
+                    {sending ? <Loader2 size={15} className="animate-spin text-white" /> : <Send size={15} className="text-white" />}
                 </button>
+                </div>
             </div>
         </motion.div>
     );
