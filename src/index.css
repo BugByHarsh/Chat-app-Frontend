@@ -2,18 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
-.elev{
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;}
-.icons{
-    scale: 1.2;
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-.icons:hover{
-    scale: 1.1;
-    box-shadow: 0px 0px 5px white;
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
 }
-div::-webkit-scrollbar{
-    display: none;
+
+body {
+  overflow-x: hidden;
+  background: #0b1020;
 }
-body,html{
-    overflow-x: hidden;
+
+::selection {
+  color: #fff;
+  background: rgba(99, 102, 241, 0.45);
+}
+
+*:focus-visible {
+  outline: 2px solid rgba(129, 140, 248, 0.9);
+  outline-offset: 3px;
+}
+
+.elev {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+
+.icons {
+  transition: transform 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.icons:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.08);
+}
+
+div::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+div::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+}
+
+div::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.32);
+}
+
+div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
