@@ -53,23 +53,23 @@ export default function Signup() {
             .catch((err) => handleToast("error", err?.response?.data || "Google signup failed."));
     };
 
-    const inputClass = "bg-[#0d0f14] border border-[#2a2d35] focus:border-blue-500 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none transition-colors w-full";
+    const inputClass = "w-full rounded-xl border border-white/[0.09] bg-[#090d18]/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 hover:border-white/15 focus:border-indigo-400/70 focus:ring-4 focus:ring-indigo-400/10";
 
     return (
-        <div className="min-h-screen bg-[#0d0f14] flex items-center justify-center p-4">
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#090d18] p-4 sm:p-6">
             <Toaster toast={toast} setToast={setToast} />
 
-            <div className="w-full max-w-lg bg-[#151820] border border-[#1e2230] rounded-2xl p-8">
+            <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/[0.09] bg-[#111827]/95 p-7 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-9">
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-indigo-300/15 bg-gradient-to-br from-indigo-400/20 to-sky-400/10 shadow-lg shadow-indigo-950/30">
                         <MessageSquare size={20} className="text-blue-400" />
                     </div>
-                    <span className="text-white text-lg font-semibold tracking-tight">Convo</span>
+                    <span className="text-lg font-semibold tracking-tight text-white">We-Convo<span className="text-indigo-300">.</span></span>
                 </div>
 
-                <h1 className="text-2xl font-semibold text-white tracking-tight mb-1">Create an account</h1>
-                <p className="text-gray-500 text-sm mb-7">Join and start messaging.</p>
+                <h1 className="mb-2 text-3xl font-semibold tracking-tight text-white">Create your account<span className="text-indigo-300">.</span></h1>
+                <p className="mb-8 text-sm leading-6 text-slate-400">A better place to keep your conversations going.</p>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="grid grid-cols-2 gap-3">
@@ -116,7 +116,7 @@ export default function Signup() {
                     </div>
 
                     <button type="submit"
-                        className="bg-blue-500 hover:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-medium transition-colors mt-1">
+                        className="mt-1 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition hover:from-indigo-400 hover:to-blue-400 focus:outline-none focus:ring-4 focus:ring-indigo-400/20">
                         Create account
                     </button>
                 </form>
@@ -133,7 +133,7 @@ export default function Signup() {
 
                 <p className="text-gray-500 text-sm text-center">
                     Already have an account?{' '}
-                    <NavLink to="/" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">Sign in</NavLink>
+                    <NavLink to="/" className="font-semibold text-indigo-300 transition-colors hover:text-indigo-200">Sign in</NavLink>
                 </p>
             </div>
         </div>
