@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "./Sidebar";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { useEffect } from "react";
 
 export default function MainContainer() {
@@ -8,15 +8,21 @@ export default function MainContainer() {
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
-      navigateTo("/");  // Redirect to home if chat is not available
+      navigateTo("/");
     }
   }, [navigateTo]);
 
-
   return (
-    <motion.div initial={{ opacity: 0.5 }} animate={{ opacity: 1 }} transition={{ duration: 0.75 }} className="rounded-lg md:flex">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+      className="flex h-[100dvh] w-full overflow-hidden"
+    >
       <SideBar />
-      <Outlet />
+      <div className="flex h-full min-h-0 min-w-0 flex-1 overflow-hidden">
+        <Outlet />
+      </div>
     </motion.div>
   );
 }
