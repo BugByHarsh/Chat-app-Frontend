@@ -96,7 +96,9 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
         }
     }
 
+    const hiddenChatIds = (() => { try { return JSON.parse(localStorage.getItem('weConvoHiddenChats') || '[]'); } catch { return []; } })();
     const filteredChats = chatData?.filter(chat => {
+        if (hiddenChatIds.includes(String(chat._id))) return false;
         const users = Array.isArray(chat.users) ? chat.users : [];
         const isGroup = users.length > 2;
         if (activeSection === 'groups' && !isGroup) return false;
