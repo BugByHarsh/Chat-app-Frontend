@@ -347,8 +347,8 @@ export default function ChatArea() {
                     </button>
                 </div>
                 <div className='flex shrink-0 items-center gap-1'>
-                    <button type='button' title='Video call' aria-label='Video call' className={'hidden rounded-full p-2 sm:inline-flex ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Video size={19}/></button>
-                    <button type='button' title='Search messages' aria-label='Search messages' className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Search size={19}/></button>
+                    <button type='button' title='Video call (coming soon)' aria-label='Video call (coming soon)' className={'hidden rounded-full p-2 sm:inline-flex ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Video size={19}/></button>
+                    <button type='button' title='Search messages (coming soon)' aria-label='Search messages (coming soon)' className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Search size={19}/></button>
                     <button type='button' title='Conversation options' aria-label='Conversation options' onClick={() => setShowChatMenu(value => !value)} className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><MoreVertical size={19}/></button>
                 </div>
                 {showChatMenu && <div className={'absolute right-3 top-12 z-50 w-60 overflow-hidden rounded-xl py-1 shadow-xl ring-1 ' + (dark ? 'bg-[#233138] text-gray-100 ring-white/10' : 'bg-white text-[#3b4a54] ring-black/10')}>
@@ -362,7 +362,7 @@ export default function ChatArea() {
             <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className={`flex-1 overflow-y-auto ${dark ? "bg-[#efeae2]" : "bg-[#efeae2]"}`}
+                className={`flex-1 overflow-y-auto ${dark ? "bg-[#0b141a]" : "bg-[#efeae2]"}`}
             >
                 {initialLoading ? (
                     <div className="flex items-center justify-center h-full">
