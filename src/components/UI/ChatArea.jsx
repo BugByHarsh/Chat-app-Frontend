@@ -427,7 +427,7 @@ export default function ChatArea() {
             </div>
 
             {/* Input */}
-            <div className={`border-t px-4 py-3 sm:px-6 ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
+            <div className={`border-t px-3 py-2.5 sm:px-4 ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
                 {(replyTo || editingMessage) && <div className={`mb-2 flex items-center justify-between gap-3 rounded-xl border-l-2 border-indigo-400 px-3 py-2 text-xs ${dark ? "bg-white/[0.04] text-gray-300" : "bg-indigo-50 text-gray-700"}`}>
                     <div className="flex min-w-0 items-center gap-2"><Reply size={14} className="flex-shrink-0 text-indigo-400"/><div className="min-w-0"><div className="font-semibold">{editingMessage ? "Editing message" : `Replying to ${replyTo?.sender?.name || "message"}`}</div><div className="truncate">{editingMessage ? editingMessage.content : (replyTo?.deletedAt ? "This message was deleted" : replyTo?.content)}</div></div></div>
                     <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
@@ -442,21 +442,31 @@ export default function ChatArea() {
                     disabled={sending}
                     onChange={handleTyping}
                     placeholder={editingMessage ? "Edit your message…" : "Type a message"}
-                    className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10
+                    className={`flex-1 rounded-full border px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15
                         ${dark
-                            ? "bg-[#090d18] border-white/[0.08] focus:border-indigo-400/60 text-white placeholder-slate-600"
-                            : "bg-slate-100 border-transparent focus:border-indigo-300 text-gray-900 placeholder-gray-400"
+                            ? "bg-[#2a3942] border-transparent focus:border-emerald-500 text-white placeholder-gray-400"
+                            : "bg-white border-transparent focus:border-emerald-300 text-[#111b21] placeholder-[#667781]"
                         }`}
                 />
                 <button
                     onClick={handleSendMessage}
                     disabled={!messageText.trim() || sending}
-                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-950/30 transition-all hover:from-indigo-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#00a884] shadow-sm transition-all hover:bg-[#008f72] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     {sending ? <Loader2 size={15} className="animate-spin text-white" /> : editingMessage ? <span className="text-xs font-semibold text-white">Save</span> : <Send size={15} className="text-white" />}
                 </button>
                 </div>
             </div>
+            {showContactInfo && <aside className={'absolute inset-y-0 right-0 z-40 flex w-full max-w-[340px] flex-col border-l shadow-2xl ' + (dark ? 'border-white/10 bg-[#111b21] text-white' : 'border-[#e9edef] bg-white text-[#111b21]')}>
+                <div className={'flex items-center gap-3 border-b px-4 py-4 ' + (dark ? 'border-white/10' : 'border-[#e9edef]')}><button type='button' aria-label='Close contact info' onClick={() => setShowContactInfo(false)} className='rounded-full p-1.5 hover:bg-black/5'><X size={19}/></button><span className='text-base font-medium'>Contact info</span></div>
+                <div className='overflow-y-auto px-5 pb-6'>
+                    <div className='flex flex-col items-center py-7 text-center'><div className='scale-[1.8]'><AvatarText name={data.name}/></div><h2 className='mt-8 text-xl font-medium'>{data.name}</h2><p className={'mt-1 text-sm ' + (dark ? 'text-gray-400' : 'text-[#667781]')}>{isOnline ? 'online' : 'We-Convo contact'}</p></div>
+                    <div className={'my-2 rounded-xl border p-4 ' + (dark ? 'border-white/10' : 'border-[#e9edef]')}><p className={'text-xs ' + (dark ? 'text-gray-400' : 'text-[#667781]')}>About</p><p className='mt-1 text-sm'>Available on We-Convo</p></div>
+                    <button type='button' onClick={toggleChatFavorite} className={'flex w-full items-center gap-3 border-b py-4 text-left text-sm ' + (dark ? 'border-white/10' : 'border-[#e9edef]')}><Star size={18} fill={isFavorite ? 'currentColor' : 'none'}/>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button>
+                    <div className='py-5'><p className={'text-sm ' + (dark ? 'text-gray-400' : 'text-[#667781]')}>Media, links and docs</p><p className={'mt-2 text-xs ' + (dark ? 'text-gray-500' : 'text-[#8696a0]')}>Shared files and media will appear here when media sharing is available.</p></div>
+                    <button type='button' onClick={() => { setShowContactInfo(false); navigateTo('/app'); }} className='flex w-full items-center gap-3 border-t border-red-500/15 py-4 text-left text-sm text-red-500'><X size={17}/> Close chat</button>
+                </div>
+            </aside>}
         </motion.div>
     );
 }
