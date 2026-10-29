@@ -1,6 +1,6 @@
 # Convo — Frontend
 
-A real-time chat application built with React. Pairs with the [Convo Backend](../backend).
+A real-time chat application built with React. Pairs with the [Convo Backend](https://github.com/BugByHarsh/Chat-app-backend).
 
 ## Tech Stack
 
@@ -11,7 +11,7 @@ A real-time chat application built with React. Pairs with the [Convo Backend](..
 - **Framer Motion** — page transitions and animations
 - **@tanstack/react-virtual** — virtual scrolling for message lists
 - **Material UI** — form components and toasts
-- **Axios** — HTTP requests
+- **Axios** — requests
 - **React Router v6** — routing
 
 ## Features
@@ -28,8 +28,8 @@ A real-time chat application built with React. Pairs with the [Convo Backend](..
 ## Getting Started
 
 ```bash
-git clone https://github.com/yourname/convo-frontend.git
-cd convo-frontend
+git clone https://github.com/BugByHarsh/Chat-app-Frontend.git
+cd Chat-app-Frontend
 npm install
 ```
 
@@ -46,16 +46,20 @@ Then run:
 npm run dev
 ```
 
+## Socket authentication
+
+The client supplies the current JWT during the Socket.IO handshake. The backend verifies the token and derives the user identity; the client no longer registers an arbitrary user ID.
+
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Auth/           # Login, Signup
-│   ├── Chat/           # ChatArea, ChatItem, Sent, Recv
-│   ├── Layout/         # MainContainer, Sidebar, Welcome
-│   ├── User/           # Profile
-│   └── miscellaneous/  # AvatarText, Modal, Toaster, Loader
+│   ├── Auth/
+│   ├── Chat/
+│   ├── Layout/
+│   ├── User/
+│   └── miscellaneous/
 ├── store/
 │   ├── index.js
 │   ├── ChatSlice.js
@@ -67,9 +71,9 @@ src/
 
 ## Deployment
 
-Deployed on **Vercel**. Set the following environment variables in your Vercel project settings:
+Set the following environment variables in Vercel:
 
-```
+```env
 VITE_API_URL=https://your-backend.onrender.com
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ```
