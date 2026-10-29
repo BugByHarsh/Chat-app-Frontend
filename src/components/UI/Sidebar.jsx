@@ -27,10 +27,9 @@ export default function SideBar() {
         try { return JSON.parse(localStorage.getItem('userData')); } catch { return null; }
     }
 
-    // FIX: guard against duplicate socket connections
+    // The socket handshake carries the JWT; the server derives the user ID.
     useEffect(() => {
-        if (!socket.connected) socket.connect();
-        socket.emit('register', safeGetUser()?._id);
+        if (localStorage.getItem('token') && !socket.connected) socket.connect();
 
         const setData = (data) => dispatch(chatActions.updateChat(data));
         const onNewChat = (newChat) => dispatch(chatActions.appendChat(newChat));
@@ -85,7 +84,7 @@ export default function SideBar() {
         }
         try {
             const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/user/api/getSearchedUser?q=${name}`,
+                `${import.meta.env.VITE_API_URL}/user/api/getSearchedUser?q=${encodeURIComponent(name.trim())}`,
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
             if (response.status === 200) setSearchResult(response.data);
@@ -97,7 +96,7 @@ export default function SideBar() {
     const filteredChats = chatData?.filter(chat => {
         if (!filter) return true;
         const me = safeGetUser();
-        const other = chat.users?.find(u => u.name !== me?.name);
+        const other = chat.users?.find(u => u._id !== me?._id);
         return other?.name?.toLowerCase().includes(filter.toLowerCase());
     });
 
@@ -112,7 +111,6 @@ export default function SideBar() {
             transition={{ duration: 0.3 }}
             className={`h-[100dvh] w-full md:w-1/3 lg:w-1/4 flex flex-col ${bg} border-r ${border} z-20`}
         >
-            {/* Top bar */}
             <div className={`flex items-center justify-between px-3 py-2.5 border-b ${border}`}>
                 <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
@@ -125,9 +123,9 @@ export default function SideBar() {
                         { icon: <User size={15} />, title: 'Profile', onClick: () => navigateTo('user/profile') },
                         { icon: <UserPlus size={15} />, title: 'New conversation', onClick: () => setSearchOpen(true) },
                         { icon: dark ? <Sun size={15} /> : <Moon size={15} />, title: 'Toggle theme', onClick: () => dispatch(themeActions.change()) },
-                        { icon: <LogOut size={15} />, title: 'Sign out', onClick: () => { localStorage.clear(); navigateTo('/'); } },
+                        { icon: <LogOut size={15} />, title: 'Sign out', onClick: () => { socket.disconnect(); localStorage.clear(); navigateTo('/'); } },
                     ].map((btn, i) => (
-                        <button key={i} title={btn.title} onClick={btn.onClick}
+                        <button key={i} title={btn.title} aria-label={btn.title} onClick={btn.onClick}
                             className={`p-1.5 rounded-lg transition-colors ${dark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}>
                             {btn.icon}
                         </button>
@@ -135,19 +133,17 @@ export default function SideBar() {
                 </div>
             </div>
 
-            {/* Filter bar */}
             <div className={`px-3 py-2 border-b ${border}`}>
                 <div className="relative">
                     <Search size={13} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? 'text-gray-600' : 'text-gray-400'}`} />
                     <input
-                        type="text" placeholder="Filter conversations…" value={filter}
+                        type="text" aria-label="Filter conversations" placeholder="Filter conversations…" value={filter}
                         onChange={e => setFilter(e.target.value)}
                         className={`w-full text-xs rounded-lg pl-8 pr-3 py-2 border outline-none transition-colors ${inputBg}`}
                     />
                 </div>
             </div>
 
-            {/* Chat list */}
             <div className="flex-1 overflow-y-auto">
                 {filteredChats?.length === 0 && (
                     <p className={`text-center text-xs mt-8 ${dark ? 'text-gray-600' : 'text-gray-400'}`}>No conversations yet</p>
@@ -162,7 +158,6 @@ export default function SideBar() {
                 ))}
             </div>
 
-            {/* New conversation modal */}
             <AnimatePresence>
                 {searchOpen && (
                     <motion.div
@@ -178,7 +173,7 @@ export default function SideBar() {
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className={`text-sm font-semibold ${dark ? 'text-white' : 'text-gray-900'}`}>New conversation</h3>
-                                <button onClick={() => setSearchOpen(false)}
+                                <button onClick={() => setSearchOpen(false)} aria-label="Close new conversation"
                                     className={`p-1 rounded-lg ${dark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}>
                                     <X size={15} />
                                 </button>
@@ -188,7 +183,7 @@ export default function SideBar() {
                                 <div className="relative flex-1">
                                     <Search size={13} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? 'text-gray-600' : 'text-gray-400'}`} />
                                     <input
-                                        type="text" placeholder="Username or email…" value={name} autoFocus
+                                        type="text" placeholder="Username or email…" value={name} autoFocus required
                                         onChange={e => setName(e.target.value)}
                                         className={`w-full text-sm rounded-lg pl-8 pr-3 py-2 border outline-none transition-colors ${inputBg}`}
                                     />
@@ -199,12 +194,14 @@ export default function SideBar() {
                                 </button>
                             </form>
 
-                            {searchError && <p className="text-red-400 text-xs mb-2">{searchError}</p>}
+                            {searchError && <p role="alert" className="text-red-400 text-xs mb-2">{searchError}</p>}
 
                             {searchResult && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
                                     onClick={() => handleCreateChat(searchResult._id)}
+                                    role="button" tabIndex={0}
+                                    onKeyDown={e => { if (e.key === 'Enter') handleCreateChat(searchResult._id); }}
                                     className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-colors ${dark ? 'bg-[#0d0f14] border-[#1e2230] hover:border-blue-500/40' : 'bg-gray-50 border-gray-200 hover:border-blue-300'}`}
                                 >
                                     <AvatarText name={searchResult.name} />
