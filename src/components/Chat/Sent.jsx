@@ -14,19 +14,16 @@ function Sent({ msg, onReply, onEdit, onDelete, onReact }) {
     const deleted = Boolean(msg.deletedAt);
     const actionClass = `flex h-8 w-8 items-center justify-center rounded-full transition-colors ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"}`;
     const closePanels = () => { setReactionOpen(false); setMenuOpen(false); };
-    const panelClass = `absolute right-0 top-full mt-1 z-30 min-w-44 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
+    const panelClass = `absolute right-0 top-7 z-30 min-w-44 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
     const menuItemClass = "flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10";
 
     return (
         <div className="flex justify-end my-1 mr-2">
             <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 <div className="relative">
-                    <div className={`absolute -top-4 right-2 z-20 flex items-center gap-0.5 rounded-full border p-0.5 shadow-lg transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33]" : "border-black/5 bg-white"} ${hovered ? "opacity-100 pointer-events-auto translate-y-0" : "opacity-0 pointer-events-none translate-y-1"}`}>
-                        <button type="button" title="Reply" aria-label="Reply to message" onClick={(e) => { e.stopPropagation(); onReply?.(msg); closePanels(); }} className={actionClass}><Reply size={16}/></button>
-                        {!deleted && <button type="button" title="React" aria-label="React to message" onClick={(e) => { e.stopPropagation(); setReactionOpen(v => !v); setMenuOpen(false); }} className={actionClass}><SmilePlus size={16}/></button>}
-                        <button type="button" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); setReactionOpen(false); }} className={actionClass}><ChevronDown size={17}/></button>
-                    </div>
-                    {reactionOpen && !deleted && <div onClick={(e) => e.stopPropagation()} className={`absolute right-0 top-full mt-1 z-30 flex items-center gap-1 rounded-full border p-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33]" : "border-gray-200 bg-white"}`}>
+                    {!deleted && <button type="button" title="React" aria-label="React to message" onClick={(e) => { e.stopPropagation(); setReactionOpen(v => !v); setMenuOpen(false); }} className={`absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33] text-gray-200 hover:bg-white/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"} ${hovered ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><SmilePlus size={17}/></button>}
+                    <button type="button" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); setReactionOpen(false); }} className={`absolute right-1 top-1 z-20 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-150 ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"} ${hovered ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><ChevronDown size={16}/></button>
+                    {reactionOpen && !deleted && <div onClick={(e) => e.stopPropagation()} className={`absolute ${s.side} top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex items-center gap-1 rounded-full border p-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33]" : "border-gray-200 bg-white"}`}>
                         {QUICK_REACTIONS.map((emoji) => <button key={emoji} type="button" title={`React ${emoji}`} aria-label={`React ${emoji}`} onClick={() => { onReact?.(msg, emoji); closePanels(); }} className="rounded-full p-1.5 text-base transition-transform hover:scale-125">{emoji}</button>)}
                     </div>}
                     {menuOpen && <div onClick={(e) => e.stopPropagation()} className={panelClass}>
