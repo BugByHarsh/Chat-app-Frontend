@@ -5,7 +5,7 @@ import { motion, useAnimationControls } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import axios from "axios";
 import dayjs from "dayjs";
-import { Trash2, Send, ChevronLeft, Loader2, X, Reply } from "lucide-react";
+import { Trash2, Send, ChevronLeft, Loader2, X, Reply, MoreVertical, Search, Video, UserPlus, Star, Check, Paperclip, Smile } from "lucide-react";
 
 import Sent from "../Chat/Sent";
 import Recv from "../Chat/Recv";
@@ -60,6 +60,9 @@ export default function ChatArea() {
     const [replyTo, setReplyTo] = useState(null);
     const [editingMessage, setEditingMessage] = useState(null);
     const [openMessageMenuId, setOpenMessageMenuId] = useState(null);
+    const [showChatMenu, setShowChatMenu] = useState(false);
+    const [showContactInfo, setShowContactInfo] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
     const [loadError, setLoadError] = useState("");
     const [weTyping, setWeTyping] = useState(false);
     const [HeTyping, setHeTyping] = useState(false);
@@ -79,6 +82,8 @@ export default function ChatArea() {
     const onlineUsers = useSelector((state) => state.online);
     const isOnline = onlineUsers.some((id) => String(id?._id ?? id) === String(data.Rid));
     const currentUserId = String(safeGetUser()?._id ?? "");
+    useEffect(() => { try { setIsFavorite(JSON.parse(localStorage.getItem("weConvoFavorites") || "[]").includes(String(data.id))); } catch { setIsFavorite(false); } }, [data.id]);
+    function toggleChatFavorite() { let saved = []; try { saved = JSON.parse(localStorage.getItem("weConvoFavorites") || "[]"); } catch {} const next = saved.includes(String(data.id)) ? saved.filter(id => id !== String(data.id)) : [...saved, String(data.id)]; localStorage.setItem("weConvoFavorites", JSON.stringify(next)); setIsFavorite(next.includes(String(data.id))); setShowChatMenu(false); }
 
     const scrollToBottom = useCallback(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
