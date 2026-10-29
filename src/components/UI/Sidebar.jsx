@@ -34,7 +34,18 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
     useEffect(() => {
         if (localStorage.getItem('token') && !socket.connected) socket.connect();
 
-        const setData = (data) => dispatch(chatActions.updateChat(data));
+        const setData = (data) => {
+            const incomingChatId = String(data?.chatId?._id ?? data?.chatId ?? "");
+            if (incomingChatId) {
+                try {
+                    const hidden = JSON.parse(localStorage.getItem('weConvoHiddenChats') || '[]');
+                    if (hidden.includes(incomingChatId)) {
+                        localStorage.setItem('weConvoHiddenChats', JSON.stringify(hidden.filter(id => String(id) !== incomingChatId)));
+                    }
+                } catch (_) {}
+            }
+            dispatch(chatActions.updateChat(data));
+        };
         const onNewChat = (newChat) => dispatch(chatActions.appendChat(newChat));
         socket.on('newChat', onNewChat);
         socket.on('newMessage', setData);
