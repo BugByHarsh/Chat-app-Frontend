@@ -59,11 +59,22 @@ export default function ChatArea() {
     const [sendError, setSendError] = useState("");
     const [replyTo, setReplyTo] = useState(null);
     const [editingMessage, setEditingMessage] = useState(null);
+    const [openMessageMenuId, setOpenMessageMenuId] = useState(null);
     const [loadError, setLoadError] = useState("");
     const [weTyping, setWeTyping] = useState(false);
     const [HeTyping, setHeTyping] = useState(false);
     const timer = useRef(null);
     const scrollRef = useRef(null);
+
+    // Only one message menu may be open. Any click outside its trigger/menu closes it.
+    useEffect(() => {
+        if (!openMessageMenuId) return;
+        const closeOnOutsideClick = (event) => {
+            if (!event.target.closest("[data-message-menu='true']")) setOpenMessageMenuId(null);
+        };
+        document.addEventListener("click", closeOnOutsideClick);
+        return () => document.removeEventListener("click", closeOnOutsideClick);
+    }, [openMessageMenuId]);
 
     const onlineUsers = useSelector((state) => state.online);
     const isOnline = onlineUsers.some((id) => String(id?._id ?? id) === String(data.Rid));
@@ -91,6 +102,7 @@ export default function ChatArea() {
         setMsgs([]);
         setReplyTo(null);
         setEditingMessage(null);
+        setOpenMessageMenuId(null);
         setHasMore(false);
         setInitialLoading(true);
         setLoadError("");
@@ -389,6 +401,7 @@ export default function ChatArea() {
                                             left: 0,
                                             width: "100%",
                                             transform: `translateY(${virtualItem.start}px)`,
+                                            zIndex: item.type === "msg" && openMessageMenuId === idOf(item.msg._id) ? 50 : 1,
                                         }}
                                     >
                                         {item.type === "date" ? (
@@ -398,9 +411,9 @@ export default function ChatArea() {
                                                 </span>
                                             </div>
                                         ) : idOf(item.msg.sender) === currentUserId ? (
-                                            <Sent msg={item.msg} onReply={startReply} onEdit={startEdit} onDelete={deleteMessage} onReact={toggleReaction} />
+                                            <Sent msg={item.msg} onReply={startReply} onEdit={startEdit} onDelete={deleteMessage} isMenuOpen={openMessageMenuId === idOf(item.msg._id)} onMenuOpenChange={setOpenMessageMenuId} />
                                         ) : (
-                                            <Recv msg={item.msg} onReply={startReply} onReact={toggleReaction} />
+                                            <Recv msg={item.msg} onReply={startReply} isMenuOpen={openMessageMenuId === idOf(item.msg._id)} onMenuOpenChange={setOpenMessageMenuId} />
                                         )}
                                     </div>
                                 );
