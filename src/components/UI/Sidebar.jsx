@@ -101,7 +101,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
         const isGroup = users.length > 2;
         if (activeSection === 'groups' && !isGroup) return false;
         if (activeSection !== 'groups' && isGroup) return false;
-        if (listFilter === 'unread') { const me = safeGetUser(); const other = users.find(u => u._id !== me?._id); const latest = chat.latestMessage; if (!latest || String(latest.sender?._id ?? latest.sender) !== String(other?._id) || latest.isRead !== false) return false; }
+        if (listFilter === 'unread') { const me = safeGetUser(); const latest = chat.latestMessage; const senderId = String(latest?.sender?._id ?? latest?.sender ?? ''); if (!latest || !senderId || senderId === String(me?._id ?? '') || latest.isRead !== false) return false; }
         if (listFilter === 'favorites' && !favorites.includes(String(chat._id))) return false;
         if (!filter) return true;
         const me = safeGetUser();
