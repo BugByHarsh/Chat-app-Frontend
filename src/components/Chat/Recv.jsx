@@ -1,35 +1,25 @@
 import { useSelector } from "react-redux";
-import { Reply, SmilePlus, ChevronDown, Copy } from "lucide-react";
+import { Reply, ChevronDown, Copy } from "lucide-react";
 import React, { useState } from "react";
 
-const QUICK_REACTIONS = ["👍", "❤️", "😂", "😮", "🙏"];
-
-function Recv({ msg, onReply, onReact }) {
+function Recv({ msg, onReply, isMenuOpen, onMenuOpenChange }) {
     const dark = useSelector((state) => state.theme.dark);
     const [hovered, setHovered] = useState(false);
-    const [reactionOpen, setReactionOpen] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
     const time = new Date(msg.createdAt);
     const timeOnly = Number.isNaN(time.getTime()) ? "" : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const deleted = Boolean(msg.deletedAt);
     const actionClass = `flex h-8 w-8 items-center justify-center rounded-full transition-colors ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"}`;
-    const closePanels = () => { setReactionOpen(false); setMenuOpen(false); };
-    const panelClass = `absolute left-0 top-7 z-30 min-w-40 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
+    const panelClass = `absolute left-0 top-6 z-[100] min-w-40 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
     const menuItemClass = "flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10";
 
     return (
         <div className="flex justify-start my-1 ml-2">
             <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 <div className="relative">
-                    {!deleted && <button type="button" title="React" aria-label="React to message" onClick={(e) => { e.stopPropagation(); setReactionOpen(v => !v); setMenuOpen(false); }} className={`absolute -right-3 top-1/2 translate-x-full -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33] text-gray-200 hover:bg-white/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"} ${hovered ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><SmilePlus size={17}/></button>}
-                    <button type="button" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); setReactionOpen(false); }} className={`absolute right-1 top-1 z-20 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-150 ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"} ${hovered ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><ChevronDown size={16}/></button>
-                    {reactionOpen && !deleted && <div onClick={(e) => e.stopPropagation()} className={`absolute right-0 translate-x-full top-1/2 -translate-y-1/2 z-30 flex items-center gap-1 rounded-full border p-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33]" : "border-gray-200 bg-white"}`}>
-                        {QUICK_REACTIONS.map((emoji) => <button key={emoji} type="button" title={`React ${emoji}`} aria-label={`React ${emoji}`} onClick={() => { onReact?.(msg, emoji); closePanels(); }} className="rounded-full p-1.5 text-base transition-transform hover:scale-125">{emoji}</button>)}
-                    </div>}
-                    {menuOpen && <div onClick={(e) => e.stopPropagation()} className={panelClass}>
-                        <button type="button" className={menuItemClass} onClick={() => { onReply?.(msg); closePanels(); }}><Reply size={15}/>Reply</button>
-                        <button type="button" className={menuItemClass} onClick={async () => { try { await navigator.clipboard.writeText(msg.content || ""); } catch {} closePanels(); }}><Copy size={15}/>Copy</button>
-                        {!deleted && <button type="button" className={menuItemClass} onClick={() => { setMenuOpen(false); setReactionOpen(true); }}><SmilePlus size={15}/>React</button>}
+                    <button type="button" data-message-menu="true" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); onMenuOpenChange?.(isMenuOpen ? null : String(msg._id)); }} className={`absolute right-1 top-1 z-20 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-150 ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"} ${hovered || isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><ChevronDown size={16}/></button>
+                    {isMenuOpen && <div data-message-menu="true" onClick={(e) => e.stopPropagation()} className={panelClass}>
+                        <button type="button" className={menuItemClass} onClick={() => { onReply?.(msg); onMenuOpenChange?.(null); }}><Reply size={15}/>Reply</button>
+                        <button type="button" className={menuItemClass} onClick={async () => { try { await navigator.clipboard.writeText(msg.content || ""); } catch {} onMenuOpenChange?.(null); }}><Copy size={15}/>Copy</button>
                     </div>}
                     <div className={`relative px-3 py-2 rounded-2xl rounded-tl-sm ${dark ? "bg-[#202c33]" : "bg-white border border-[#e9edef]"}`}>
                         {msg.replyTo && <div className={`mb-2 rounded-lg border-l-2 border-[#53bdeb] px-2 py-1 text-xs ${dark ? "bg-black/15 text-gray-300" : "bg-[#f0f2f5] text-gray-600"}`}><div className="font-semibold">{msg.replyTo.sender?.name || "Reply"}</div><div className="truncate">{msg.replyTo.deletedAt ? "This message was deleted" : msg.replyTo.content}</div></div>}
@@ -42,7 +32,6 @@ function Recv({ msg, onReply, onReact }) {
                         </div>
                     </div>
                 </div>
-                {msg.reactions?.length > 0 && <div className="relative z-[2] flex flex-wrap justify-start gap-1 mt-1">{Object.entries(msg.reactions.reduce((acc, r) => ({...acc, [r.emoji]: (acc[r.emoji] || 0) + 1}), {})).map(([emoji, count]) => <button key={emoji} type="button" onClick={(e) => { e.stopPropagation(); onReact?.(msg, emoji); }} className={`rounded-full border px-2 py-0.5 text-xs shadow-sm ${dark ? "border-white/10 bg-[#202c33]" : "border-gray-200 bg-white"}`}>{emoji} {count}</button>)}</div>}
             </div>
         </div>
     );
