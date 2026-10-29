@@ -228,7 +228,7 @@ export default function ChatArea() {
             className={`flex flex-col h-[100dvh] flex-grow sm:absolute sm:top-0 sm:w-full lg:static ${dark ? "bg-[#0d0f14]" : "bg-gray-50"}`}
         >
             {/* Header */}
-            <div className={`flex items-center justify-between px-4 py-2.5 border-b ${dark ? "bg-[#151820] border-[#1e2230]" : "bg-white border-gray-200"}`}>
+            <div className={`flex items-center justify-between border-b px-5 py-4 shadow-sm ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
                 <div className="flex items-center gap-2.5">
                     <button onClick={goBack} className={`md:hidden p-1.5 rounded-lg ${dark ? "text-gray-400 hover:text-white hover:bg-white/5" : "text-gray-500 hover:bg-gray-100"}`}>
                         <ChevronLeft size={18} />
@@ -254,7 +254,7 @@ export default function ChatArea() {
             <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className={`flex-1 overflow-y-auto ${dark ? "bg-[#0d0f14]" : "bg-gray-50"}`}
+                className={`flex-1 overflow-y-auto ${dark ? "bg-[#0b1020]" : "bg-slate-50"}`}
             >
                 {initialLoading ? (
                     <div className="flex items-center justify-center h-full">
@@ -313,7 +313,7 @@ export default function ChatArea() {
             </div>
 
             {/* Input */}
-            <div className={`flex items-center gap-2 px-3 py-2.5 border-t ${dark ? "bg-[#151820] border-[#1e2230]" : "bg-white border-gray-200"}`}>
+            <div className={`flex items-center gap-3 border-t px-4 py-4 sm:px-6 ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
                 <input
                     type="text"
                     value={messageText}
@@ -321,16 +321,16 @@ export default function ChatArea() {
                     onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                     onChange={handleTyping}
                     placeholder="Message…"
-                    className={`flex-1 rounded-xl px-4 py-2.5 text-sm outline-none border transition-colors
+                    className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10
                         ${dark
-                            ? "bg-[#0d0f14] border-[#2a2d35] focus:border-blue-500/50 text-white placeholder-gray-600"
-                            : "bg-gray-100 border-transparent focus:border-blue-300 text-gray-900 placeholder-gray-400"
+                            ? "bg-[#090d18] border-white/[0.08] focus:border-indigo-400/60 text-white placeholder-slate-600"
+                            : "bg-slate-100 border-transparent focus:border-indigo-300 text-gray-900 placeholder-gray-400"
                         }`}
                 />
                 <button
                     onClick={handleSendMessage}
                     disabled={!messageText.trim()}
-                    className="w-9 h-9 bg-blue-500 hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-950/30 transition-all hover:from-indigo-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     <Send size={15} className="text-white" />
                 </button>
