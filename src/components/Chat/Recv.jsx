@@ -21,7 +21,7 @@ function Recv({ msg, onReply, onReact }) {
         <div className="flex justify-start my-1 ml-2">
             <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 <div className="relative">
-                    <div className={`absolute -top-4 left-2 z-20 items-center gap-0.5 rounded-full border p-0.5 shadow-lg transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33]" : "border-black/5 bg-white"} ${hovered ? "opacity-100 pointer-events-auto translate-y-0" : "opacity-0 pointer-events-none translate-y-1"}`}>
+                    <div className={`absolute -top-4 left-2 z-20 flex items-center gap-0.5 rounded-full border p-0.5 shadow-lg transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33]" : "border-black/5 bg-white"} ${hovered ? "opacity-100 pointer-events-auto translate-y-0" : "opacity-0 pointer-events-none translate-y-1"}`}>
                         <button type="button" title="Reply" aria-label="Reply to message" onClick={(e) => { e.stopPropagation(); onReply?.(msg); closePanels(); }} className={actionClass}><Reply size={16}/></button>
                         {!deleted && <button type="button" title="React" aria-label="React to message" onClick={(e) => { e.stopPropagation(); setReactionOpen(v => !v); setMenuOpen(false); }} className={actionClass}><SmilePlus size={16}/></button>}
                         <button type="button" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); setReactionOpen(false); }} className={actionClass}><ChevronDown size={17}/></button>
