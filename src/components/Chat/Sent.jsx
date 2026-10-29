@@ -6,6 +6,7 @@ const QUICK_REACTIONS = ["👍", "❤️", "😂", "😮", "🙏"];
 
 function Sent({ msg, onReply, onEdit, onDelete, onReact }) {
     const dark = useSelector((state) => state.theme.dark);
+    const [hovered, setHovered] = useState(false);
     const [reactionOpen, setReactionOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const time = new Date(msg.createdAt);
@@ -18,9 +19,9 @@ function Sent({ msg, onReply, onEdit, onDelete, onReact }) {
 
     return (
         <div className="flex justify-end my-1 mr-2">
-            <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0 group">
+            <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 <div className="relative">
-                    <div className={`absolute -top-4 right-2 z-20 items-center gap-0.5 rounded-full border p-0.5 shadow-lg transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33]" : "border-black/5 bg-white"} hidden sm:flex sm:pointer-events-none sm:opacity-0 sm:translate-y-1 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 sm:group-hover:translate-y-0 sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-focus-within:translate-y-0`}>
+                    <div className={`absolute -top-4 right-2 z-20 items-center gap-0.5 rounded-full border p-0.5 shadow-lg transition-all duration-150 ${dark ? "border-white/10 bg-[#202c33]" : "border-black/5 bg-white"} ${hovered ? "opacity-100 pointer-events-auto translate-y-0" : "opacity-0 pointer-events-none translate-y-1"}`}>
                         <button type="button" title="Reply" aria-label="Reply to message" onClick={(e) => { e.stopPropagation(); onReply?.(msg); closePanels(); }} className={actionClass}><Reply size={16}/></button>
                         {!deleted && <button type="button" title="React" aria-label="React to message" onClick={(e) => { e.stopPropagation(); setReactionOpen(v => !v); setMenuOpen(false); }} className={actionClass}><SmilePlus size={16}/></button>}
                         <button type="button" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); setReactionOpen(false); }} className={actionClass}><ChevronDown size={17}/></button>
