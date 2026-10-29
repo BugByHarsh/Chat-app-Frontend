@@ -75,27 +75,27 @@ export default function Profile() {
     }
 
     const isEditing = editing.name || editing.username || editing.email;
-    const borderClass = dark ? 'border-[#1e2230]' : 'border-gray-200';
+    const borderClass = dark ? 'border-white/10' : 'border-[#e9edef]';
 
     return (
         <motion.div
             variants={{ initial: { x: 15, opacity: 0 }, fadein: { x: 0, opacity: 1 }, fadeOut: { x: 15, opacity: 0 } }}
             transition={{ duration: 0.3 }}
             animate={controls}
-            className={`flex flex-col h-[100dvh] flex-grow sm:absolute sm:top-0 sm:w-full lg:static z-20 ${dark ? 'bg-[#0d0f14]' : 'bg-gray-50'}`}
+            className={`flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${dark ? 'bg-[#111b21]' : 'bg-[#f7f8fa]'}`}
         >
             <Toaster toast={toast} setToast={setToast} />
 
             {/* Header */}
-            <div className={`flex items-center gap-3 px-4 py-3 border-b ${dark ? 'bg-[#151820] border-[#1e2230]' : 'bg-white border-gray-200'}`}>
+            <div className={`flex items-center gap-3 px-5 py-4 border-b ${dark ? 'bg-[#202c33] border-white/10' : 'bg-[#f0f2f5] border-[#e9edef]'}`}>
                 <button onClick={goBack}
                     className={`p-1.5 rounded-lg md:hidden ${dark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:bg-gray-100'}`}>
                     <ChevronLeft size={18} />
                 </button>
-                <span className={`text-sm font-semibold flex-1 ${dark ? 'text-white' : 'text-gray-900'}`}>Profile</span>
+                <span className={`text-base font-medium flex-1 ${dark ? 'text-white' : 'text-[#111b21]'}`}>Profile</span>
                 {isEditing && (
                     <button onClick={handleSave}
-                        className="bg-blue-500 hover:bg-blue-400 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+                        className="bg-[#00a884] hover:bg-[#008f72] text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors">
                         Save changes
                     </button>
                 )}
@@ -103,9 +103,9 @@ export default function Profile() {
 
             <div className="flex-1 overflow-y-auto">
                 {/* Avatar section */}
-                <div className={`flex flex-col items-center py-10 px-6 border-b ${dark ? 'bg-[#151820] border-[#1e2230]' : 'bg-white border-gray-200'}`}>
+                <div className={`flex flex-col items-center py-10 px-6 border-b ${dark ? 'bg-[#111b21] border-white/10' : 'bg-white border-[#e9edef]'}`}>
                     <AvatarText name={userData.name || '?'} profile={true} />
-                    <h2 className={`text-lg font-semibold mt-4 mb-1 tracking-tight ${dark ? 'text-white' : 'text-gray-900'}`}>
+                    <h2 className={`text-xl font-medium mt-4 mb-1 tracking-tight ${dark ? 'text-white' : 'text-[#111b21]'}`}>
                         {userData.name}
                     </h2>
                     <p className="text-sm text-gray-500">@{userData.username}</p>
@@ -127,11 +127,8 @@ export default function Profile() {
                                         autoFocus
                                         value={newUserData[field] || ''}
                                         onChange={e => setNewUserData(p => ({ ...p, [field]: e.target.value }))}
-                                        className={`text-sm w-full rounded-lg px-2.5 py-1.5 outline-none border transition-colors
-                                            ${dark
-                                                ? 'bg-[#0d0f14] border-[#2a2d35] focus:border-blue-500 text-white'
-                                                : 'bg-gray-50 border-gray-200 focus:border-blue-400 text-gray-900'
-                                            }`}
+                                        className={`text-sm w-full rounded-lg px-3 py-2 outline-none border transition-colors
+                                            ${dark ? 'bg-[#202c33] border-white/10 focus:border-emerald-500 text-white' : 'bg-[#f7f8fa] border-[#d1d7db] focus:border-emerald-500 text-[#111b21]'}`}
                                     />
                                 ) : (
                                     <p className={`text-sm truncate ${dark ? 'text-gray-200' : 'text-gray-800'}`}>{value}</p>
