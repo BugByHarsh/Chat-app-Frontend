@@ -24,7 +24,9 @@ const chatSlice = createSlice({
       const chatId = idOf(message?.chatId);
       const chatIndex = state.findIndex((chat) => idOf(chat._id) === chatId);
       if (chatIndex !== -1) {
-        state[chatIndex].latestMessage = message;
+        const existing = state[chatIndex].latestMessage;
+        const sameMessageAlreadyRead = existing && idOf(existing._id) === idOf(message?._id) && existing.isRead === true;
+        state[chatIndex].latestMessage = sameMessageAlreadyRead ? { ...message, isRead: true } : message;
         sortByRecentMessage(state);
       }
     },
