@@ -13,6 +13,12 @@ import { socket } from "../../Utils/socket";
 import AvatarText from "../miscellaneous/AvatarText";
 import { chatActions } from "../../store/ChatSlice";
 
+const idOf = (value) => value == null ? "" : String(value._id ?? value);
+
+function safeGetUser() {
+    try { return JSON.parse(localStorage.getItem("userData")); } catch { return null; }
+}
+
 // Build a flat list of items: date separators + messages interleaved
 function buildItems(msgs) {
     const items = [];
@@ -55,18 +61,15 @@ export default function ChatArea() {
     const [weTyping, setWeTyping] = useState(false);
     const [HeTyping, setHeTyping] = useState(false);
     const timer = useRef(null);
+    const scrollRef = useRef(null);
 
     const onlineUsers = useSelector((state) => state.online);
     const isOnline = onlineUsers.some((id) => String(id?._id ?? id) === String(data.Rid));
     const currentUserId = String(safeGetUser()?._id ?? "");
 
-    function idOf(value) {
-        return value == null ? "" : String(value._id ?? value);
-    }
-
-    function safeGetUser() {
-        try { return JSON.parse(localStorage.getItem("userData")); } catch { return null; }
-    }
+    const scrollToBottom = useCallback(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }, []);
 
     // ── Fetch ────────────────────────────────────────────────────────────────
 
@@ -104,7 +107,7 @@ export default function ChatArea() {
             setInitialLoading(false);
         });
         return () => { cancelled = true; };
-    }, [data.id, data.Rid, currentUserId, dispatch, fetchMessages]);
+    }, [data.id, data.Rid, currentUserId, controls, dispatch, fetchMessages, scrollToBottom]);
 
     // Load older messages (triggered by scrolling to top)
     async function loadMore() {
@@ -213,7 +216,6 @@ export default function ChatArea() {
     // ── Virtual scrolling ────────────────────────────────────────────────────
 
     const items = buildItems(msgs);
-    const scrollRef = useRef(null);
 
     const virtualizer = useVirtualizer({
         count: items.length,
@@ -222,12 +224,6 @@ export default function ChatArea() {
         estimateSize: (i) => items[i]?.type === "date" ? 32 : 44,
         overscan: 10,   // render 10 extra items above/below viewport for smoothness
     });
-
-    function scrollToBottom() {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-    }
 
     // Detect scroll-to-top to trigger loadMore
     function handleScroll(e) {
@@ -240,8 +236,6 @@ export default function ChatArea() {
         controls.start("fadeOut");
         setTimeout(() => navigateTo(".."), 300);
     }
-
-    const borderClass = dark ? "border-[#1e2230]" : "border-gray-200";
 
     return (
         <motion.div
