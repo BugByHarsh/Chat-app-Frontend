@@ -5,7 +5,7 @@ import { motion, useAnimationControls } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import axios from "axios";
 import dayjs from "dayjs";
-import { Trash2, Send, ChevronLeft, Loader2 } from "lucide-react";
+import { Trash2, Send, ChevronLeft, Loader2, X, Reply } from "lucide-react";
 
 import Sent from "../Chat/Sent";
 import Recv from "../Chat/Recv";
@@ -57,6 +57,8 @@ export default function ChatArea() {
     const [messageText, setMessageText] = useState("");
     const [sending, setSending] = useState(false);
     const [sendError, setSendError] = useState("");
+    const [replyTo, setReplyTo] = useState(null);
+    const [editingMessage, setEditingMessage] = useState(null);
     const [loadError, setLoadError] = useState("");
     const [weTyping, setWeTyping] = useState(false);
     const [HeTyping, setHeTyping] = useState(false);
@@ -87,6 +89,8 @@ export default function ChatArea() {
         controls.set("initial");
         controls.start("fadein");
         setMsgs([]);
+        setReplyTo(null);
+        setEditingMessage(null);
         setHasMore(false);
         setInitialLoading(true);
         setLoadError("");
@@ -154,6 +158,21 @@ export default function ChatArea() {
             setMsgs(prev => prev.some((message) => idOf(message._id) === idOf(visibleMessage._id)) ? prev : [visibleMessage, ...prev]);
             requestAnimationFrame(() => scrollToBottom());
         };
+        const onMessageUpdated = (updated) => {
+            if (idOf(updated.chatId) !== idOf(data.id)) return;
+            setMsgs(prev => prev.map(message => idOf(message._id) === idOf(updated._id) ? updated : message));
+            dispatch(chatActions.updateChat(updated));
+        };
+        const onMessageDeleted = (updated) => {
+            if (idOf(updated.chatId) !== idOf(data.id)) return;
+            setMsgs(prev => prev.map(message => idOf(message._id) === idOf(updated._id) ? updated : message));
+            dispatch(chatActions.updateChat(updated));
+        };
+        const onMessageReactionUpdated = (updated) => {
+            if (idOf(updated.chatId) !== idOf(data.id)) return;
+            setMsgs(prev => prev.map(message => idOf(message._id) === idOf(updated._id) ? updated : message));
+            dispatch(chatActions.updateChat(updated));
+        };
         const onMarkRead = (id) => {
             if (idOf(data.id) !== idOf(id)) return;
             const currentId = String(safeGetUser()?._id ?? "");
@@ -161,12 +180,18 @@ export default function ChatArea() {
             setMsgs(prev => prev.map((message) => idOf(message.sender) === currentId ? { ...message, isRead: true } : message));
         };
 
+        socket.on("messageUpdated", onMessageUpdated);
+        socket.on("messageDeleted", onMessageDeleted);
+        socket.on("messageReactionUpdated", onMessageReactionUpdated);
         socket.on("markRead", onMarkRead);
         socket.on("typing", onTyping);
         socket.on("stoppedTyping", onStoppedTyping);
         socket.on("newMessage", onNewMessage);
 
         return () => {
+            socket.off("messageUpdated", onMessageUpdated);
+            socket.off("messageDeleted", onMessageDeleted);
+            socket.off("messageReactionUpdated", onMessageReactionUpdated);
             socket.off("typing", onTyping);
             socket.off("stoppedTyping", onStoppedTyping);
             socket.off("markRead", onMarkRead);
@@ -183,22 +208,70 @@ export default function ChatArea() {
         setSending(true);
         setSendError("");
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/msg`,
-                { Rid: data.Rid, chatID: data.id, content: text },
-                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-            );
+            const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
+            const response = editingMessage
+                ? await axios.patch(`${import.meta.env.VITE_API_URL}/msg/${editingMessage._id}`, { content: text }, config)
+                : await axios.post(`${import.meta.env.VITE_API_URL}/msg`, { chatID: data.id, content: text, replyTo: replyTo?._id || null }, config);
             if (response.status === 200) {
-                dispatch(chatActions.updateChat(response.data));
-                setMsgs(prev => prev.some((message) => idOf(message._id) === idOf(response.data._id)) ? prev : [response.data, ...prev]);
+                const saved = response.data;
+                if (editingMessage) setMsgs(prev => prev.map(message => idOf(message._id) === idOf(saved._id) ? saved : message));
+                else setMsgs(prev => prev.some(message => idOf(message._id) === idOf(saved._id)) ? prev : [saved, ...prev]);
+                dispatch(chatActions.updateChat(saved));
                 setMessageText((current) => current.trim() === text ? "" : current);
+                setReplyTo(null);
+                setEditingMessage(null);
                 setSendError("");
                 requestAnimationFrame(() => scrollToBottom());
             }
         } catch (error) {
-            setSendError(error.response?.data?.message || "Couldn't send the message. Your text is still here—please try again.");
+            setSendError(error.response?.data?.message || (editingMessage ? "Couldn't edit the message. Please try again." : "Couldn't send the message. Your text is still here—please try again."));
         } finally {
             setSending(false);
+        }
+    }
+
+    function startReply(message) {
+        setEditingMessage(null);
+        setReplyTo(message);
+    }
+
+    function startEdit(message) {
+        if (message.deletedAt) return;
+        setReplyTo(null);
+        setEditingMessage(message);
+        setMessageText(message.content || "");
+        setSendError("");
+    }
+
+    async function deleteMessage(message) {
+        if (!message?._id || message.deletedAt) return;
+        if (!window.confirm("Delete this message for everyone?")) return;
+        setSendError("");
+        try {
+            const response = await axios.delete(`${import.meta.env.VITE_API_URL}/msg/${message._id}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
+            setMsgs(prev => prev.map(item => idOf(item._id) === idOf(response.data._id) ? response.data : item));
+            dispatch(chatActions.updateChat(response.data));
+            if (idOf(editingMessage?._id) === idOf(message._id)) {
+                setEditingMessage(null);
+                setMessageText("");
+            }
+        } catch (error) {
+            setSendError(error.response?.data?.message || "Couldn't delete this message. Please try again.");
+        }
+    }
+
+    async function toggleReaction(message, emoji) {
+        if (!message?._id || message.deletedAt) return;
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/msg/${message._id}/reactions`, { emoji }, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
+            setMsgs(prev => prev.map(item => idOf(item._id) === idOf(response.data._id) ? response.data : item));
+            dispatch(chatActions.updateChat(response.data));
+        } catch (error) {
+            setSendError(error.response?.data?.message || "Couldn't save that reaction. Please try again.");
         }
     }
 
@@ -325,9 +398,9 @@ export default function ChatArea() {
                                                 </span>
                                             </div>
                                         ) : idOf(item.msg.sender) === currentUserId ? (
-                                            <Sent msg={item.msg} />
+                                            <Sent msg={item.msg} onReply={startReply} onEdit={startEdit} onDelete={deleteMessage} onReact={toggleReaction} />
                                         ) : (
-                                            <Recv msg={item.msg} />
+                                            <Recv msg={item.msg} onReply={startReply} onReact={toggleReaction} />
                                         )}
                                     </div>
                                 );
@@ -339,6 +412,10 @@ export default function ChatArea() {
 
             {/* Input */}
             <div className={`border-t px-4 py-3 sm:px-6 ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
+                {(replyTo || editingMessage) && <div className={`mb-2 flex items-center justify-between gap-3 rounded-xl border-l-2 border-indigo-400 px-3 py-2 text-xs ${dark ? "bg-white/[0.04] text-gray-300" : "bg-indigo-50 text-gray-700"}`}>
+                    <div className="flex min-w-0 items-center gap-2"><Reply size={14} className="flex-shrink-0 text-indigo-400"/><div className="min-w-0"><div className="font-semibold">{editingMessage ? "Editing message" : `Replying to ${replyTo?.sender?.name || "message"}`}</div><div className="truncate">{editingMessage ? editingMessage.content : (replyTo?.deletedAt ? "This message was deleted" : replyTo?.content)}</div></div></div>
+                    <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
+                </div>}
                 {sendError && <p role="alert" className="mb-2 text-xs text-red-400">{sendError}</p>}
                 <div className="flex items-center gap-3">
                 <input
@@ -348,7 +425,7 @@ export default function ChatArea() {
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
                     disabled={sending}
                     onChange={handleTyping}
-                    placeholder="Message…"
+                    placeholder={editingMessage ? "Edit your message…" : "Message…"}
                     className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10
                         ${dark
                             ? "bg-[#090d18] border-white/[0.08] focus:border-indigo-400/60 text-white placeholder-slate-600"
@@ -360,7 +437,7 @@ export default function ChatArea() {
                     disabled={!messageText.trim() || sending}
                     className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 shadow-lg shadow-indigo-950/30 transition-all hover:from-indigo-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                    {sending ? <Loader2 size={15} className="animate-spin text-white" /> : <Send size={15} className="text-white" />}
+                    {sending ? <Loader2 size={15} className="animate-spin text-white" /> : editingMessage ? <span className="text-xs font-semibold text-white">Save</span> : <Send size={15} className="text-white" />}
                 </button>
                 </div>
             </div>
