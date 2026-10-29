@@ -62,23 +62,23 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d0f14] flex items-center justify-center p-4">
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#090d18] p-4 sm:p-6">
             <Toaster toast={toast} setToast={setToast} />
             <Backdrop sx={{ color: '#4a9eff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isLoading}>
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            <div className="w-full max-w-md bg-[#151820] border border-[#1e2230] rounded-2xl p-8">
+            <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/[0.09] bg-[#111827]/95 p-7 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-9">
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-indigo-300/15 bg-gradient-to-br from-indigo-400/20 to-sky-400/10 shadow-lg shadow-indigo-950/30">
                         <MessageSquare size={20} className="text-blue-400" />
                     </div>
-                    <span className="text-white text-lg font-semibold tracking-tight">Convo</span>
+                    <span className="text-lg font-semibold tracking-tight text-white">We-Convo<span className="text-indigo-300">.</span></span>
                 </div>
 
-                <h1 className="text-2xl font-semibold text-white tracking-tight mb-1">Welcome back</h1>
-                <p className="text-gray-500 text-sm mb-7">Sign in to continue your conversations.</p>
+                <h1 className="mb-2 text-3xl font-semibold tracking-tight text-white">Welcome back<span className="text-indigo-300">.</span></h1>
+                <p className="mb-8 text-sm leading-6 text-slate-400">Sign in to pick up where your conversations left off.</p>
 
                 <form onSubmit={handleLogin} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-1.5">
@@ -108,7 +108,7 @@ export default function Login() {
                     </div>
 
                     <button type="submit"
-                        className="bg-blue-500 hover:bg-blue-400 text-white rounded-lg py-2.5 text-sm font-medium transition-colors mt-1">
+                        className="mt-1 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition hover:from-indigo-400 hover:to-blue-400 focus:outline-none focus:ring-4 focus:ring-indigo-400/20">
                         Sign in
                     </button>
                 </form>
@@ -125,7 +125,7 @@ export default function Login() {
 
                 <p className="text-gray-500 text-sm text-center">
                     No account?{' '}
-                    <NavLink to="/signup" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                    <NavLink to="/signup" className="font-semibold text-indigo-300 transition-colors hover:text-indigo-200">
                         Create one
                     </NavLink>
                 </p>
