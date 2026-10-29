@@ -15,7 +15,7 @@ const chatSlice = createSlice({
   initialState: [],
   reducers: {
     createChat(state, action) {
-      const chats = Array.isArray(action.payload) ? action.payload : [];
+      const chats = Array.isArray(action.payload) ? [...action.payload] : [];
       sortByRecentMessage(chats);
       return chats;
     },
