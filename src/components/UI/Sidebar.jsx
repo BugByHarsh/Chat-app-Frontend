@@ -109,14 +109,14 @@ export default function SideBar() {
             initial={{ x: -10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className={`h-[100dvh] w-full md:w-1/3 lg:w-1/4 flex flex-col ${bg} border-r ${border} z-20`}
+            className={`relative z-20 flex h-[100dvh] w-full flex-col border-r ${bg} ${border} md:w-[320px] lg:w-[360px]`}
         >
-            <div className={`flex items-center justify-between px-3 py-2.5 border-b ${border}`}>
+            <div className={`flex items-center justify-between border-b px-4 py-4 ${border}`}>
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-indigo-300/15 bg-gradient-to-br from-indigo-400/20 to-sky-400/10">
                         <MessageSquare size={15} className="text-blue-400" />
                     </div>
-                    <span className={`text-sm font-semibold tracking-tight ${dark ? 'text-white' : 'text-gray-900'}`}>Convo</span>
+                    <span className={`text-base font-semibold tracking-tight ${dark ? 'text-white' : 'text-gray-900'}`}>We-Convo<span className="text-indigo-400">.</span></span>
                 </div>
                 <div className="flex items-center gap-0.5">
                     {[
@@ -133,13 +133,13 @@ export default function SideBar() {
                 </div>
             </div>
 
-            <div className={`px-3 py-2 border-b ${border}`}>
+            <div className={`border-b px-4 py-3 ${border}`}>
                 <div className="relative">
                     <Search size={13} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? 'text-gray-600' : 'text-gray-400'}`} />
                     <input
-                        type="text" aria-label="Filter conversations" placeholder="Filter conversations…" value={filter}
+                        type="text" aria-label="Filter conversations" placeholder="Search conversations" value={filter}
                         onChange={e => setFilter(e.target.value)}
-                        className={`w-full text-xs rounded-lg pl-8 pr-3 py-2 border outline-none transition-colors ${inputBg}`}
+                        className={`w-full rounded-xl border py-2.5 pl-9 pr-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10 ${inputBg}`}
                     />
                 </div>
             </div>
