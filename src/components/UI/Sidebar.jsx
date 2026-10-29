@@ -20,6 +20,8 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
     const [searchError, setSearchError] = useState('');
     const [filter, setFilter] = useState('');
     const [listFilter, setListFilter] = useState('all');
+    const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem('weConvoFavorites') || '[]'); } catch { return []; } });
+    function toggleFavorite(id) { setFavorites(prev => { const next = prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]; localStorage.setItem('weConvoFavorites', JSON.stringify(next)); return next; }); }
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
 
@@ -100,7 +102,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
         if (activeSection === 'groups' && !isGroup) return false;
         if (activeSection !== 'groups' && isGroup) return false;
         if (listFilter === 'unread') { const me = safeGetUser(); const other = users.find(u => u._id !== me?._id); const latest = chat.latestMessage; if (!latest || String(latest.sender?._id ?? latest.sender) !== String(other?._id) || latest.isRead !== false) return false; }
-        if (listFilter === 'favorites') return false;
+        if (listFilter === 'favorites' && !favorites.includes(String(chat._id))) return false;
         if (!filter) return true;
         const me = safeGetUser();
         const other = users.find(u => u._id !== me?._id);
@@ -167,7 +169,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.2, delay: index * 0.04 }}>
-                        <ChatItem chat={chat} />
+                        <ChatItem chat={chat} isFavorite={favorites.includes(String(chat._id))} onToggleFavorite={() => toggleFavorite(String(chat._id))} />
                     </motion.div>
                 ))}
             </div>
