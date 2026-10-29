@@ -337,27 +337,25 @@ export default function ChatArea() {
             animate={controls}
             className={`relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${dark ? "bg-[#0b141a]" : "bg-gray-50"}`}
         >
-            {/* Header */}
-            <div className={`flex items-center justify-between border-b px-5 py-4 shadow-sm ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
-                <div className="flex items-center gap-2.5">
-                    <button onClick={goBack} className={`md:hidden p-1.5 rounded-lg ${dark ? "text-gray-400 hover:text-white hover:bg-white/5" : "text-gray-500 hover:bg-gray-100"}`}>
-                        <ChevronLeft size={18} />
+            {/* WhatsApp-style conversation header */}
+            <div className={'relative z-20 flex items-center justify-between border-b px-4 py-2.5 ' + (dark ? 'bg-[#202c33] border-white/[0.06]' : 'bg-[#f0f2f5] border-[#e9edef]')}>
+                <div className='flex min-w-0 items-center gap-3'>
+                    <button type='button' onClick={goBack} aria-label='Back to chats' className={'rounded-full p-1.5 md:hidden ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><ChevronLeft size={19}/></button>
+                    <button type='button' onClick={() => setShowContactInfo(value => !value)} className='flex min-w-0 items-center gap-3 text-left'>
+                        <div className='relative shrink-0'><AvatarText name={data.name}/><span className={'absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 ' + (dark ? 'border-[#202c33]' : 'border-[#f0f2f5]') + (isOnline ? ' bg-emerald-500' : ' bg-gray-400')}/></div>
+                        <div className='min-w-0'><p className={'m-0 truncate text-sm font-medium ' + (dark ? 'text-white' : 'text-[#111b21]')}>{data.name}</p><p className={'m-0 text-xs ' + (HeTyping ? 'text-emerald-500' : dark ? 'text-gray-400' : 'text-[#667781]')}>{HeTyping ? 'typing…' : isOnline ? 'online' : 'offline'}</p></div>
                     </button>
-                    <div className="relative">
-                        <AvatarText name={data.name} />
-                        <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${dark ? "border-[#151820]" : "border-white"} ${isOnline ? "bg-green-400" : "bg-gray-600"}`} />
-                    </div>
-                    <div>
-                        <p className={`text-sm font-semibold m-0 ${dark ? "text-white" : "text-gray-900"}`}>{data.name}</p>
-                        {HeTyping
-                            ? <p className="text-xs text-blue-400 italic m-0">typing…</p>
-                            : <p className={`text-xs m-0 ${isOnline ? "text-green-400" : dark ? "text-gray-600" : "text-gray-400"}`}>{isOnline ? "Online" : "Offline"}</p>
-                        }
-                    </div>
                 </div>
-                <button className={`p-2 rounded-lg ${dark ? "text-gray-600 hover:text-gray-400 hover:bg-white/5" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}>
-                    <Trash2 size={16} />
-                </button>
+                <div className='flex shrink-0 items-center gap-1'>
+                    <button type='button' title='Video call' aria-label='Video call' className={'hidden rounded-full p-2 sm:inline-flex ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Video size={19}/></button>
+                    <button type='button' title='Search messages' aria-label='Search messages' className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Search size={19}/></button>
+                    <button type='button' title='Conversation options' aria-label='Conversation options' onClick={() => setShowChatMenu(value => !value)} className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><MoreVertical size={19}/></button>
+                </div>
+                {showChatMenu && <div className={'absolute right-3 top-12 z-50 w-60 overflow-hidden rounded-xl py-1 shadow-xl ring-1 ' + (dark ? 'bg-[#233138] text-gray-100 ring-white/10' : 'bg-white text-[#3b4a54] ring-black/10')}>
+                    <button type='button' onClick={() => { setShowContactInfo(true); setShowChatMenu(false); }} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-black/5'><UserPlus size={16}/> Contact info</button>
+                    <button type='button' onClick={toggleChatFavorite} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-black/5'><Star size={16} fill={isFavorite ? 'currentColor' : 'none'}/>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button>
+                    <button type='button' onClick={() => { setShowChatMenu(false); navigateTo('/app'); }} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-black/5'><X size={16}/> Close chat</button>
+                </div>}
             </div>
 
             {/* Messages — virtual scroll container */}
