@@ -330,10 +330,10 @@ export default function ChatArea() {
             variants={{ initial: { x: 15, opacity: 0 }, fadein: { x: 0, opacity: 1 }, fadeOut: { x: 15, opacity: 0 } }}
             transition={{ duration: 0.3 }}
             animate={controls}
-            className={`relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${dark ? "bg-[#0d0f14]" : "bg-gray-50"}`}
+            className={`relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${dark ? "bg-[#0b141a]" : "bg-gray-50"}`}
         >
             {/* Header */}
-            <div className={`flex items-center justify-between border-b px-5 py-4 shadow-sm ${dark ? "bg-[#111827] border-white/[0.06]" : "bg-white border-gray-200"}`}>
+            <div className={`flex items-center justify-between border-b px-5 py-4 shadow-sm ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
                 <div className="flex items-center gap-2.5">
                     <button onClick={goBack} className={`md:hidden p-1.5 rounded-lg ${dark ? "text-gray-400 hover:text-white hover:bg-white/5" : "text-gray-500 hover:bg-gray-100"}`}>
                         <ChevronLeft size={18} />
@@ -359,7 +359,7 @@ export default function ChatArea() {
             <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className={`flex-1 overflow-y-auto ${dark ? "bg-[#0b1020]" : "bg-slate-50"}`}
+                className={`flex-1 overflow-y-auto ${dark ? "bg-[#efeae2]" : "bg-[#efeae2]"}`}
             >
                 {initialLoading ? (
                     <div className="flex items-center justify-center h-full">
@@ -438,7 +438,7 @@ export default function ChatArea() {
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
                     disabled={sending}
                     onChange={handleTyping}
-                    placeholder={editingMessage ? "Edit your message…" : "Message…"}
+                    placeholder={editingMessage ? "Edit your message…" : "Type a message"}
                     className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10
                         ${dark
                             ? "bg-[#090d18] border-white/[0.08] focus:border-indigo-400/60 text-white placeholder-slate-600"
