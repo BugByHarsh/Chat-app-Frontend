@@ -61,6 +61,7 @@ export default function ChatArea() {
     const [editingMessage, setEditingMessage] = useState(null);
     const [openMessageMenuId, setOpenMessageMenuId] = useState(null);
     const [showChatMenu, setShowChatMenu] = useState(false);
+    const [showDeleteChatConfirm, setShowDeleteChatConfirm] = useState(false);
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [showCallPrompt, setShowCallPrompt] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
@@ -85,6 +86,7 @@ export default function ChatArea() {
     const currentUserId = String(safeGetUser()?._id ?? "");
     useEffect(() => { try { setIsFavorite(JSON.parse(localStorage.getItem("weConvoFavorites") || "[]").includes(String(data.id))); } catch { setIsFavorite(false); } }, [data.id]);
     function toggleChatFavorite() { let saved = []; try { saved = JSON.parse(localStorage.getItem("weConvoFavorites") || "[]"); } catch {} const next = saved.includes(String(data.id)) ? saved.filter(id => id !== String(data.id)) : [...saved, String(data.id)]; localStorage.setItem("weConvoFavorites", JSON.stringify(next)); setIsFavorite(next.includes(String(data.id))); setShowChatMenu(false); }
+    function deleteChatForMe() { let hidden = []; try { hidden = JSON.parse(localStorage.getItem("weConvoHiddenChats") || "[]"); } catch {} const chatId = String(data.id); if (!hidden.includes(chatId)) localStorage.setItem("weConvoHiddenChats", JSON.stringify([...hidden, chatId])); setShowDeleteChatConfirm(false); setShowChatMenu(false); navigateTo("/app"); }
 
     const scrollToBottom = useCallback(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -356,6 +358,7 @@ export default function ChatArea() {
                     <button type='button' onClick={() => { setShowContactInfo(true); setShowChatMenu(false); }} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-black/5'><UserPlus size={16}/> Contact info</button>
                     <button type='button' onClick={toggleChatFavorite} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-black/5'><Star size={16} fill={isFavorite ? 'currentColor' : 'none'}/>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button>
                     <button type='button' onClick={() => { setShowChatMenu(false); navigateTo('/app'); }} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-black/5'><X size={16}/> Close chat</button>
+                    <button type='button' onClick={() => { setShowChatMenu(false); setShowDeleteChatConfirm(true); }} className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-500 hover:bg-red-500/10'><Trash2 size={16}/> Delete chat</button>
                 </div>}
             </div>
 
@@ -458,6 +461,14 @@ export default function ChatArea() {
                 </button>
                 </div>
             </div>
+            {showDeleteChatConfirm && <div className='absolute inset-0 z-[80] flex items-center justify-center bg-black/45 p-4' onClick={() => setShowDeleteChatConfirm(false)}>
+                <section role='dialog' aria-modal='true' aria-labelledby='delete-chat-title' onClick={event => event.stopPropagation()} className={'w-full max-w-sm rounded-2xl p-6 shadow-2xl ' + (dark ? 'bg-[#202c33] text-white' : 'bg-white text-[#111b21]')}>
+                    <div className='mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-red-500/10 text-red-500'><Trash2 size={21}/></div>
+                    <h2 id='delete-chat-title' className='text-lg font-semibold'>Delete this chat?</h2>
+                    <p className={'mt-2 text-sm leading-6 ' + (dark ? 'text-gray-300' : 'text-[#667781]')}>This removes the conversation from your We-Convo chat list on this device. It does not delete the other person's copy or erase messages from the server.</p>
+                    <div className='mt-5 flex justify-end gap-2'><button type='button' onClick={() => setShowDeleteChatConfirm(false)} className={'rounded-full border px-4 py-2.5 text-sm font-medium ' + (dark ? 'border-white/15 hover:bg-white/5' : 'border-[#d1d7db] hover:bg-gray-50')}>Cancel</button><button type='button' onClick={deleteChatForMe} className='rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700'>Delete chat</button></div>
+                </section>
+            </div>}
             {showCallPrompt && <div className='absolute inset-0 z-[70] flex items-center justify-center bg-black/40 p-4' onClick={() => setShowCallPrompt(false)}>
                 <section role='dialog' aria-modal='true' aria-labelledby='call-prompt-title' onClick={event => event.stopPropagation()} className={'w-full max-w-sm rounded-2xl p-6 shadow-2xl ' + (dark ? 'bg-[#202c33] text-white' : 'bg-white text-[#111b21]')}>
                     <div className='mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-[#00a884]'><Video size={27}/></div>
