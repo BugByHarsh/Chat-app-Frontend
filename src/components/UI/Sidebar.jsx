@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { UserPlus, LogOut, Moon, Sun, Search, MessageSquare, X } from 'lucide-react';
+import { UserPlus, LogOut, Moon, Sun, Search, MessageSquare, X, Plus } from 'lucide-react';
 
 import { themeActions } from '../../store/ThemeSlice';
 import { chatActions } from '../../store/ChatSlice';
@@ -19,6 +19,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
     const [searchResult, setSearchResult] = useState(null);
     const [searchError, setSearchError] = useState('');
     const [filter, setFilter] = useState('');
+    const [listFilter, setListFilter] = useState('all');
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
 
@@ -98,6 +99,8 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
         const isGroup = users.length > 2;
         if (activeSection === 'groups' && !isGroup) return false;
         if (activeSection !== 'groups' && isGroup) return false;
+        if (listFilter === 'unread') { const me = safeGetUser(); const other = users.find(u => u._id !== me?._id); const latest = chat.latestMessage; if (!latest || String(latest.sender?._id ?? latest.sender) !== String(other?._id) || latest.isRead !== false) return false; }
+        if (listFilter === 'favorites') return false;
         if (!filter) return true;
         const me = safeGetUser();
         const other = users.find(u => u._id !== me?._id);
@@ -114,7 +117,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
             initial={{ x: -10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className={`relative z-20 flex h-full w-full shrink-0 flex-col border-r ${bg} ${border} md:w-[320px] lg:w-[360px]`}
+            className={`relative z-20 flex h-full w-full shrink-0 flex-col border-r ${bg} ${border} md:w-[340px] lg:w-[380px]`}
         >
             <div className={`flex items-center justify-between border-b px-4 py-4 ${border}`}>
                 <div className="flex items-center gap-2.5">
@@ -143,11 +146,18 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                     <input
                         type="text" aria-label="Filter conversations" placeholder={activeSection === 'groups' ? 'Search groups' : 'Search chats'} value={filter}
                         onChange={e => setFilter(e.target.value)}
-                        className={`w-full rounded-xl border py-2.5 pl-9 pr-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10 ${inputBg}`}
+                        className={`w-full rounded-full border py-2.5 pl-9 pr-3 text-[13px] outline-none transition focus:ring-2 focus:ring-emerald-500/15 ${inputBg}`}
                     />
                 </div>
             </div>
 
+            <div className="flex items-center gap-2 overflow-x-auto px-4 py-3">
+                {[{id:'all',label:'All'},{id:'unread',label:'Unread'},{id:'favorites',label:'Favorites'},{id:'groups',label:'Groups'}].map(tab => (
+                    <button key={tab.id} type="button" onClick={() => { if (tab.id === 'groups') { setActiveSection('groups'); setListFilter('all'); } else { setActiveSection('chats'); setListFilter(tab.id); } }}
+                        className={'shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors ' + ((tab.id === 'groups' ? activeSection === 'groups' : activeSection === 'chats' && listFilter === tab.id) ? (dark ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-300' : 'border-[#d0f0e2] bg-[#d9fdd3] text-[#176b52]') : (dark ? 'border-white/10 text-gray-400 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'))}>{tab.label}</button>
+                ))}
+                <button type="button" title="New conversation" onClick={() => setSearchOpen(true)} className={'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ' + (dark ? 'border-white/10 text-gray-400' : 'border-gray-300 text-gray-600')}><Plus size={15}/></button>
+            </div>
             <div className="flex-1 overflow-y-auto">
                 {filteredChats?.length === 0 && (
                     <p className={`text-center text-xs mt-8 ${dark ? 'text-gray-600' : 'text-gray-400'}`}>{activeSection === 'groups' ? 'No groups yet. Group conversations will appear here.' : 'No conversations yet. Start a chat with someone new.'}</p>
