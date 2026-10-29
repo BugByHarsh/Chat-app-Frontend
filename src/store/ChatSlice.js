@@ -30,6 +30,13 @@ const chatSlice = createSlice({
         sortByRecentMessage(state);
       }
     },
+    updateLatestMessage(state, action) {
+      const message = action.payload;
+      const chat = state.find((item) => idOf(item._id) === idOf(message?.chatId));
+      if (chat?.latestMessage && idOf(chat.latestMessage._id) === idOf(message?._id)) {
+        chat.latestMessage = message;
+      }
+    },
     // The current user has opened this conversation. Only an incoming latest
     // message should be marked read in the sidebar.
     markChatRead(state, action) {
