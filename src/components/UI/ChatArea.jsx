@@ -145,6 +145,9 @@ export default function ChatArea() {
             if (idOf(newMsg.chatId) !== idOf(data.id)) return;
             const currentId = String(safeGetUser()?._id ?? "");
             const visibleMessage = idOf(newMsg.sender) !== currentId ? { ...newMsg, isRead: true } : newMsg;
+            // Update the inbox from this active-chat listener too. The reducer
+            // preserves a read state if duplicate socket listeners run in either order.
+            dispatch(chatActions.updateChat(visibleMessage));
             dispatch(chatActions.markChatRead({ chatId: data.id, userId: currentId }));
             socket.emit("msgsRead", { chatId: data.id });
             setHeTyping(false);
