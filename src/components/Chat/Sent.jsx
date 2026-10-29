@@ -8,6 +8,8 @@ function Sent({ msg, onReply, onEdit, onDelete, isMenuOpen, onMenuOpenChange }) 
     const time = new Date(msg.createdAt);
     const timeOnly = Number.isNaN(time.getTime()) ? "" : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const deleted = Boolean(msg.deletedAt);
+    const messageAge = Date.now() - new Date(msg.createdAt).getTime();
+    const canEdit = Number.isFinite(messageAge) && messageAge >= 0 && messageAge <= 15 * 60 * 1000;
     const panelClass = `absolute right-0 top-6 z-[100] min-w-44 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
     const menuItemClass = "flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10";
 
@@ -19,7 +21,7 @@ function Sent({ msg, onReply, onEdit, onDelete, isMenuOpen, onMenuOpenChange }) 
                     {isMenuOpen && <div data-message-menu="true" onClick={(e) => e.stopPropagation()} className={panelClass}>
                         <button type="button" className={menuItemClass} onClick={() => { onReply?.(msg); onMenuOpenChange?.(null); }}><Reply size={15}/>Reply</button>
                         <button type="button" className={menuItemClass} onClick={async () => { try { await navigator.clipboard.writeText(msg.content || ""); } catch {} onMenuOpenChange?.(null); }}><Copy size={15}/>Copy</button>
-                        {!deleted && <button type="button" className={menuItemClass} onClick={() => { onEdit?.(msg); onMenuOpenChange?.(null); }}><Pencil size={15}/>Edit message</button>}
+                        {!deleted && canEdit && <button type="button" className={menuItemClass} onClick={() => { onEdit?.(msg); onMenuOpenChange?.(null); }}><Pencil size={15}/>Edit message</button>}
                         {!deleted && <button type="button" className={`${menuItemClass} text-red-500`} onClick={() => { onDelete?.(msg); onMenuOpenChange?.(null); }}><Trash2 size={15}/>Delete message</button>}
                     </div>}
                     <div className={`relative px-3 py-2 rounded-2xl rounded-tr-sm ${dark ? "bg-[#005c4b]" : "bg-[#d9fdd3]"}`}>
