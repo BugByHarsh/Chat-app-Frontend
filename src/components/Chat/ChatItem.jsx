@@ -15,10 +15,12 @@ export default function ChatItem({ chat, isFavorite = false, onToggleFavorite })
     try { userData = JSON.parse(localStorage.getItem("userData")); } catch { userData = null; }
 
     const currentUserId = idOf(userData?._id);
-    const otherUser = chat.users?.find((user) => idOf(user) !== currentUserId);
-    const name = otherUser?.name || "Unknown user";
+    const chatUsers = Array.isArray(chat.users) ? chat.users : [];
+    const isGroup = chatUsers.length > 2;
+    const otherUser = chatUsers.find((user) => idOf(user) !== currentUserId);
+    const name = isGroup ? (chat.chatName || chat.name || chatUsers.filter(user => idOf(user) !== currentUserId).map(user => user?.name).filter(Boolean).slice(0, 3).join(", ") || "Group chat") : (otherUser?.name || "Unknown user");
     const recipientId = idOf(otherUser);
-    const isOnline = onlineUsers.some((id) => idOf(id) === recipientId);
+    const isOnline = !isGroup && onlineUsers.some((id) => idOf(id) === recipientId);
     const latestMsg = chat.latestMessage;
     const createdAt = latestMsg?.createdAt;
     const parsedTime = createdAt ? new Date(createdAt) : null;
@@ -47,7 +49,7 @@ export default function ChatItem({ chat, isFavorite = false, onToggleFavorite })
         >
             <div className="relative flex-shrink-0">
                 <AvatarText name={name} />
-                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${dark ? 'border-[#151820]' : 'border-white'} ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`} />
+                {!isGroup && <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${dark ? 'border-[#151820]' : 'border-white'} ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`} />}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-baseline justify-between mb-0.5">
