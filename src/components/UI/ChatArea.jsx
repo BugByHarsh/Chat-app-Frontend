@@ -62,6 +62,7 @@ export default function ChatArea() {
     const [openMessageMenuId, setOpenMessageMenuId] = useState(null);
     const [showChatMenu, setShowChatMenu] = useState(false);
     const [showContactInfo, setShowContactInfo] = useState(false);
+    const [showCallPrompt, setShowCallPrompt] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [loadError, setLoadError] = useState("");
     const [weTyping, setWeTyping] = useState(false);
@@ -347,7 +348,7 @@ export default function ChatArea() {
                     </button>
                 </div>
                 <div className='flex shrink-0 items-center gap-1'>
-                    <button type='button' title='Video call (coming soon)' aria-label='Video call (coming soon)' className={'hidden rounded-full p-2 sm:inline-flex ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Video size={19}/></button>
+                    <button type='button' title='Call from the We-Convo desktop app' aria-label='Call from the We-Convo desktop app' onClick={() => setShowCallPrompt(true)} className={'hidden rounded-full p-2 sm:inline-flex ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Video size={19}/></button>
                     <button type='button' title='Search messages (coming soon)' aria-label='Search messages (coming soon)' className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><Search size={19}/></button>
                     <button type='button' title='Conversation options' aria-label='Conversation options' onClick={() => setShowChatMenu(value => !value)} className={'rounded-full p-2 ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><MoreVertical size={19}/></button>
                 </div>
@@ -457,6 +458,14 @@ export default function ChatArea() {
                 </button>
                 </div>
             </div>
+            {showCallPrompt && <div className='absolute inset-0 z-[70] flex items-center justify-center bg-black/40 p-4' onClick={() => setShowCallPrompt(false)}>
+                <section role='dialog' aria-modal='true' aria-labelledby='call-prompt-title' onClick={event => event.stopPropagation()} className={'w-full max-w-sm rounded-2xl p-6 shadow-2xl ' + (dark ? 'bg-[#202c33] text-white' : 'bg-white text-[#111b21]')}>
+                    <div className='mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-[#00a884]'><Video size={27}/></div>
+                    <h2 id='call-prompt-title' className='text-center text-lg font-semibold'>Call from the We-Convo app</h2>
+                    <p className={'mt-2 text-center text-sm leading-6 ' + (dark ? 'text-gray-300' : 'text-[#667781]')}>Voice and video calls on desktop will open in the We-Convo app. Downloadable app support is coming soon.</p>
+                    <div className='mt-5 flex gap-2'><button type='button' onClick={() => setShowCallPrompt(false)} className={'flex-1 rounded-full border px-4 py-2.5 text-sm font-medium ' + (dark ? 'border-white/15 hover:bg-white/5' : 'border-[#d1d7db] hover:bg-gray-50')}>Not now</button><button type='button' disabled className='flex-1 cursor-not-allowed rounded-full bg-[#00a884]/50 px-4 py-2.5 text-sm font-semibold text-white' title='App download is not available yet'>Download app</button></div>
+                </section>
+            </div>}
             {showContactInfo && <aside className={'absolute inset-y-0 right-0 z-40 flex w-full max-w-[340px] flex-col border-l shadow-2xl ' + (dark ? 'border-white/10 bg-[#111b21] text-white' : 'border-[#e9edef] bg-white text-[#111b21]')}>
                 <div className={'flex items-center gap-3 border-b px-4 py-4 ' + (dark ? 'border-white/10' : 'border-[#e9edef]')}><button type='button' aria-label='Close contact info' onClick={() => setShowContactInfo(false)} className='rounded-full p-1.5 hover:bg-black/5'><X size={19}/></button><span className='text-base font-medium'>Contact info</span></div>
                 <div className='overflow-y-auto px-5 pb-6'>
