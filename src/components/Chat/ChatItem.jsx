@@ -60,7 +60,7 @@ export default function ChatItem({ chat }) {
                 </div>
                 <div className="flex items-center justify-between">
                     <span className={`text-xs truncate flex items-center gap-1 ${isUnread ? (dark ? 'text-gray-300' : 'text-gray-700') : dark ? 'text-gray-400' : 'text-gray-400'}`}>
-                        {latestMsg == null ? 'Tap to chat' : latestMsg.content}
+                        {latestMsg == null ? 'Tap to chat' : latestMsg.deletedAt ? 'This message was deleted' : latestMsg.content}
                         {isSentByMe && (
                             <CheckCheck size={11} className="flex-shrink-0" color={latestMsg.isRead ? '#60a5fa' : '#6b7280'} />
                         )}
