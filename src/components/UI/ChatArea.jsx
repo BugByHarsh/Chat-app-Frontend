@@ -161,7 +161,7 @@ export default function ChatArea() {
         const onMessageUpdated = (updated) => {
             if (idOf(updated.chatId) !== idOf(data.id)) return;
             setMsgs(prev => prev.map(message => idOf(message._id) === idOf(updated._id) ? updated : message));
-            dispatch(chatActions.updateChat(updated));
+            dispatch(chatActions.updateLatestMessage(updated));
         };
         const onMessageDeleted = (updated) => {
             if (idOf(updated.chatId) !== idOf(data.id)) return;
@@ -252,7 +252,7 @@ export default function ChatArea() {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
             });
             setMsgs(prev => prev.map(item => idOf(item._id) === idOf(response.data._id) ? response.data : item));
-            dispatch(chatActions.updateChat(response.data));
+            dispatch(chatActions.updateLatestMessage(response.data));
             if (idOf(editingMessage?._id) === idOf(message._id)) {
                 setEditingMessage(null);
                 setMessageText("");
