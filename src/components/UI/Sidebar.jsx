@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { User, UserPlus, LogOut, Moon, Sun, Search, MessageSquare, X } from 'lucide-react';
+import { UserPlus, LogOut, Moon, Sun, Search, MessageSquare, X } from 'lucide-react';
 
 import { themeActions } from '../../store/ThemeSlice';
 import { chatActions } from '../../store/ChatSlice';
@@ -11,7 +11,7 @@ import { socket } from '../../Utils/socket';
 import ChatItem from '../Chat/ChatItem';
 import AvatarText from '../miscellaneous/AvatarText';
 
-export default function SideBar() {
+export default function SideBar({ activeSection = 'chats', setActiveSection = () => {} }) {
     const chatData = useSelector(state => state.chat);
     const dark = useSelector(state => state.theme.dark);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -94,10 +94,15 @@ export default function SideBar() {
     }
 
     const filteredChats = chatData?.filter(chat => {
+        const users = Array.isArray(chat.users) ? chat.users : [];
+        const isGroup = users.length > 2;
+        if (activeSection === 'groups' && !isGroup) return false;
+        if (activeSection !== 'groups' && isGroup) return false;
         if (!filter) return true;
         const me = safeGetUser();
-        const other = chat.users?.find(u => u._id !== me?._id);
-        return other?.name?.toLowerCase().includes(filter.toLowerCase());
+        const other = users.find(u => u._id !== me?._id);
+        const title = isGroup ? (chat.chatName || chat.name || '') : (other?.name || '');
+        return title.toLowerCase().includes(filter.toLowerCase());
     });
 
     const bg = dark ? 'bg-[#151820]' : 'bg-white';
@@ -120,7 +125,6 @@ export default function SideBar() {
                 </div>
                 <div className="flex items-center gap-0.5">
                     {[
-                        { icon: <User size={15} />, title: 'Profile', onClick: () => navigateTo('user/profile') },
                         { icon: <UserPlus size={15} />, title: 'New conversation', onClick: () => setSearchOpen(true) },
                         { icon: dark ? <Sun size={15} /> : <Moon size={15} />, title: 'Toggle theme', onClick: () => dispatch(themeActions.change()) },
                         { icon: <LogOut size={15} />, title: 'Sign out', onClick: () => { socket.disconnect(); localStorage.clear(); navigateTo('/'); } },
@@ -137,7 +141,7 @@ export default function SideBar() {
                 <div className="relative">
                     <Search size={13} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? 'text-gray-600' : 'text-gray-400'}`} />
                     <input
-                        type="text" aria-label="Filter conversations" placeholder="Search conversations" value={filter}
+                        type="text" aria-label="Filter conversations" placeholder={activeSection === 'groups' ? 'Search groups' : 'Search chats'} value={filter}
                         onChange={e => setFilter(e.target.value)}
                         className={`w-full rounded-xl border py-2.5 pl-9 pr-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-400/10 ${inputBg}`}
                     />
@@ -146,7 +150,7 @@ export default function SideBar() {
 
             <div className="flex-1 overflow-y-auto">
                 {filteredChats?.length === 0 && (
-                    <p className={`text-center text-xs mt-8 ${dark ? 'text-gray-600' : 'text-gray-400'}`}>No conversations yet</p>
+                    <p className={`text-center text-xs mt-8 ${dark ? 'text-gray-600' : 'text-gray-400'}`}>{activeSection === 'groups' ? 'No groups yet. Group conversations will appear here.' : 'No conversations yet. Start a chat with someone new.'}</p>
                 )}
                 {filteredChats?.map((chat, index) => (
                     <motion.div key={chat._id || index}
