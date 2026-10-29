@@ -109,7 +109,7 @@ export default function SideBar() {
             initial={{ x: -10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className={`relative z-20 flex h-[100dvh] w-full flex-col border-r ${bg} ${border} md:w-[320px] lg:w-[360px]`}
+            className={`relative z-20 flex h-full w-full shrink-0 flex-col border-r ${bg} ${border} md:w-[320px] lg:w-[360px]`}
         >
             <div className={`flex items-center justify-between border-b px-4 py-4 ${border}`}>
                 <div className="flex items-center gap-2.5">
