@@ -29,7 +29,7 @@ export default function ChatItem({ chat, isFavorite = false, onToggleFavorite })
         : "";
 
     const senderId = idOf(latestMsg?.sender);
-    const isUnread = Boolean(latestMsg && senderId && senderId === recipientId && latestMsg.isRead === false);
+    const isUnread = Boolean(latestMsg && senderId && senderId !== currentUserId && latestMsg.isRead === false);
     const isSentByMe = Boolean(latestMsg && senderId && senderId === currentUserId);
 
     return (
