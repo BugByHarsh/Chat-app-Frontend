@@ -257,6 +257,7 @@ export default function ChatArea() {
     function startReply(message) {
         setEditingMessage(null);
         setReplyTo(message);
+        requestAnimationFrame(() => messageInputRef.current?.focus());
     }
 
     function startEdit(message) {
@@ -265,6 +266,10 @@ export default function ChatArea() {
         setEditingMessage(message);
         setMessageText(message.content || "");
         setSendError("");
+        requestAnimationFrame(() => {
+            messageInputRef.current?.focus();
+            messageInputRef.current?.select();
+        });
     }
 
     async function deleteMessage(message) {
