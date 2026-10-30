@@ -28,7 +28,7 @@ export default function AvatarText({ name, profile }) {
         return {
             sx: {
                 bgcolor: stringToColor(name),
-                width: profile ? '100px' : "35px",
+                width: profile ? '100px' : "40px",
                 height: profile ? '100px' : "35px",
                 fontSize: profile ? '50px' : "",
             },
