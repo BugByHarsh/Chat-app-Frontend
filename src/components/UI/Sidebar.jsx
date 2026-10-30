@@ -132,15 +132,15 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
             initial={{ x: -10, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className={`relative z-20 flex h-full w-full shrink-0 flex-col border-r ${bg} ${border} md:w-[340px] lg:w-[380px]`}
+            className={`relative z-20 flex h-full w-full shrink-0 flex-col border-r ${bg} ${border} md:w-[360px] lg:w-[410px]`}
         >
             <div className={`flex items-center justify-between px-5 pb-3 pt-5`}>
                 <div className="flex items-center gap-2.5">
-                    <span className={`text-[23px] font-semibold tracking-tight ${dark ? 'text-white' : 'text-[#008f69]'}`}>We-Convo</span>
+                    <span className={`text-2xl font-semibold tracking-tight ${dark ? 'text-white' : 'text-[#008f69]'}`}>We-Convo</span>
                 </div>
                 <div className="flex items-center gap-0.5">
                     {[
-                        { icon: <UserPlus size={15} />, title: 'New conversation', onClick: () => setSearchOpen(true) },
+                        { icon: <UserPlus size={17} />, title: 'New conversation', onClick: () => setSearchOpen(true) },
                         { icon: dark ? <Sun size={15} /> : <Moon size={15} />, title: 'Toggle theme', onClick: () => dispatch(themeActions.change()) },
                         { icon: <LogOut size={15} />, title: 'Sign out', onClick: () => { socket.disconnect(); localStorage.clear(); navigateTo('/'); } },
                     ].map((btn, i) => (
@@ -152,23 +152,23 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                 </div>
             </div>
 
-            <div className={`border-b px-4 py-3 ${border}`}>
+            <div className={`border-b px-4 py-3.5 ${border}`}>
                 <div className="relative">
-                    <Search size={13} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? 'text-gray-600' : 'text-gray-400'}`} />
+                    <Search size={15} className={`absolute left-3 top-1/2 -translate-y-1/2 ${dark ? 'text-gray-600' : 'text-gray-400'}`} />
                     <input
                         type="text" aria-label="Filter conversations" placeholder={activeSection === 'groups' ? 'Search groups' : 'Search chats'} value={filter}
                         onChange={e => setFilter(e.target.value)}
-                        className={`w-full rounded-full border py-2.5 pl-9 pr-3 text-[13px] outline-none transition focus:ring-2 focus:ring-emerald-500/15 ${inputBg}`}
+                        className={`w-full rounded-full border py-3 pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15 ${inputBg}`}
                     />
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto px-4 py-3">
+            <div className="flex items-center gap-2 overflow-x-auto px-4 py-3.5">
                 {[{id:'all',label:'All'},{id:'unread',label:'Unread'},{id:'favorites',label:'Favorites'},{id:'groups',label:'Groups'}].map(tab => (
                     <button key={tab.id} type="button" onClick={() => { if (tab.id === 'groups') { setActiveSection('groups'); setListFilter('all'); } else { setActiveSection('chats'); setListFilter(tab.id); } }}
-                        className={'shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors ' + ((tab.id === 'groups' ? activeSection === 'groups' : activeSection === 'chats' && listFilter === tab.id) ? (dark ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-300' : 'border-[#d0f0e2] bg-[#d9fdd3] text-[#176b52]') : (dark ? 'border-white/10 text-gray-400 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'))}>{tab.label}</button>
+                        className={'shrink-0 rounded-full border px-3.5 py-2 text-[13px] transition-colors ' + ((tab.id === 'groups' ? activeSection === 'groups' : activeSection === 'chats' && listFilter === tab.id) ? (dark ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-300' : 'border-[#d0f0e2] bg-[#d9fdd3] text-[#176b52]') : (dark ? 'border-white/10 text-gray-400 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'))}>{tab.label}</button>
                 ))}
-                <button type="button" title="New conversation" onClick={() => setSearchOpen(true)} className={'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ' + (dark ? 'border-white/10 text-gray-400' : 'border-gray-300 text-gray-600')}><Plus size={15}/></button>
+                <button type="button" title="New conversation" onClick={() => setSearchOpen(true)} className={'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ' + (dark ? 'border-white/10 text-gray-400' : 'border-gray-300 text-gray-600')}><Plus size={17}/></button>
             </div>
             <div className="flex-1 overflow-y-auto">
                 {filteredChats?.length === 0 && (
