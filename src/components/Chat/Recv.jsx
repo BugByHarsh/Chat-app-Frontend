@@ -21,7 +21,7 @@ function Recv({ msg, onReply, isMenuOpen, onMenuOpenChange }) {
     const menuItemClass = "flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-[15px] hover:bg-black/5 dark:hover:bg-white/10";
 
     return (
-        <div className="flex justify-start my-1 ml-2">
+        <div className="flex justify-start my-1 ml-10">
             <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 <div className="relative">
                     <button type="button" data-message-menu="true" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); onMenuOpenChange?.(isMenuOpen ? null : String(msg._id)); }} className={`absolute right-1 top-1 z-20 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-150 ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"} ${hovered || isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><ChevronDown size={16}/></button>
