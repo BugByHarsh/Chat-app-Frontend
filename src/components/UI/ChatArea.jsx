@@ -462,7 +462,7 @@ export default function ChatArea() {
                 </div>}
                 {sendError && <p role="alert" className="mb-2 text-xs text-red-400">{sendError}</p>}
                 <div className="flex items-center gap-3">
-                    <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-full bg-transparent px-3.5 py-1.5">
+                    <div className={`relative flex min-w-0 flex-1 items-center gap-2 rounded-full px-3.5 py-1.5 shadow-sm ${dark ? "bg-[#202c33]" : "bg-white"}`}>
                         {showEmojiPicker && <div className={`absolute bottom-[calc(100%+12px)] left-0 z-50 grid w-[min(320px,calc(100vw-48px))] grid-cols-8 gap-1 rounded-2xl border p-3 shadow-xl ${dark ? "border-white/10 bg-[#202c33]" : "border-[#e9edef] bg-white"}`}>
                             {["😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤔","🤗","😭","🥹","😢","😡","👍","👎","👏","🙏","❤️","💕","🔥","🎉","💯","✨","💀","🤝","🙌","💪","👀","💬","☕","🌹","🥳","😴","🤦","🤷","😏","🫡"].map((emoji) => <button key={emoji} type="button" onClick={() => insertEmoji(emoji)} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xl transition hover:scale-110 ${dark ? "hover:bg-white/10" : "hover:bg-gray-100"}`} aria-label={`Insert ${emoji}`}>{emoji}</button>)}
                         </div>}
