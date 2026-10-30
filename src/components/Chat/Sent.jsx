@@ -34,12 +34,12 @@ function Sent({ msg, onReply, onEdit, onDelete, isMenuOpen, onMenuOpenChange }) 
                         {!deleted && <button type="button" className={`${menuItemClass} text-red-500`} onClick={() => { onDelete?.(msg); onMenuOpenChange?.(null); }}><Trash2 size={15}/>Delete message</button>}
                     </div>}
                     <div className={`relative px-3.5 py-2.5 rounded-2xl rounded-tr-sm ${dark ? "bg-[#005c4b]" : "bg-[#d9fdd3]"}`}>
-                        {msg.replyTo && <div className={`mb-2 rounded-lg border-l-2 border-[#53bdeb] px-2 py-1 text-xs ${dark ? "bg-black/15 text-gray-300" : "bg-black/5 text-gray-600"}`}><div className="font-semibold">{msg.replyTo.sender?.name || "Reply"}</div><div className="truncate">{msg.replyTo.deletedAt ? "This message was deleted" : msg.replyTo.content}</div></div>}
+                        {msg.replyTo && <div className={`mb-2 rounded-lg border-l-2 border-[#53bdeb] px-2.5 py-1.5 text-[13px] font-medium ${dark ? "bg-black/15 text-gray-300" : "bg-black/5 text-gray-600"}`}><div className="font-semibold">{msg.replyTo.sender?.name || "Reply"}</div><div className="truncate">{msg.replyTo.deletedAt ? "This message was deleted" : msg.replyTo.content}</div></div>}
                         <div className="flex items-end gap-2">
-                            <p className={`text-[15px] leading-relaxed break-words whitespace-pre-wrap min-w-0 flex-1 m-0 ${deleted ? "italic opacity-70" : ""} ${dark ? "text-white" : "text-[#111b21]"}`}>{deleted ? "This message was deleted" : msg.content}</p>
+                            <p className={`text-base font-medium leading-relaxed break-words whitespace-pre-wrap min-w-0 flex-1 m-0 ${deleted ? "italic opacity-70" : ""} ${dark ? "text-white" : "text-[#111b21]"}`}>{deleted ? "This message was deleted" : msg.content}</p>
                             <div className="flex items-center gap-1 flex-shrink-0 self-end">
-                                {msg.editedAt && !deleted && <span className="text-[10px] opacity-60">edited</span>}
-                                <span className={`text-[11px] whitespace-nowrap ${dark ? "text-white/60" : "text-[#667781]"}`}>{timeOnly}</span>
+                                {msg.editedAt && !deleted && <span className="text-[11px] font-medium opacity-75">edited</span>}
+                                <span className={`text-xs font-medium whitespace-nowrap ${dark ? "text-white/60" : "text-[#667781]"}`}>{timeOnly}</span>
                                 <CheckCheck size={15} color={msg.isRead ? "#53bdeb" : dark ? "rgba(255,255,255,0.6)" : "#8696a0"} />
                             </div>
                         </div>
