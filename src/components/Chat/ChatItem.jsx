@@ -53,15 +53,15 @@ export default function ChatItem({ chat, isFavorite = false, onToggleFavorite })
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-baseline justify-between mb-0.5">
-                    <span className={`text-[15px] truncate ${isUnread ? 'font-semibold' : 'font-medium'} ${dark ? 'text-white' : 'text-gray-900'}`}>
+                    <span className={`text-base font-semibold truncate ${isUnread ? 'font-semibold' : 'font-medium'} ${dark ? 'text-white' : 'text-gray-900'}`}>
                         {name}
                     </span>
-                    <span className={`text-xs flex-shrink-0 ml-2 ${isUnread ? 'text-blue-400' : dark ? 'text-gray-600' : 'text-gray-400'}`}>
+                    <span className={`text-[13px] font-medium flex-shrink-0 ml-2 ${isUnread ? 'text-blue-400' : dark ? 'text-gray-600' : 'text-gray-400'}`}>
                         {validTime}
                     </span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className={`text-[13px] truncate flex items-center gap-1 ${isUnread ? (dark ? 'text-gray-300' : 'text-gray-700') : dark ? 'text-gray-400' : 'text-gray-400'}`}>
+                    <span className={`text-sm font-medium truncate flex items-center gap-1 ${isUnread ? (dark ? 'text-gray-300' : 'text-gray-700') : dark ? 'text-gray-300' : 'text-gray-600'}`}>
                         {latestMsg == null ? 'Tap to chat' : latestMsg.deletedAt ? 'This message was deleted' : latestMsg.content}
                         {isSentByMe && (
                             <CheckCheck size={13} className="flex-shrink-0" color={latestMsg.isRead ? '#60a5fa' : '#6b7280'} />
