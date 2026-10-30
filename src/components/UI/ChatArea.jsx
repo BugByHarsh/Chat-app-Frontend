@@ -326,7 +326,7 @@ export default function ChatArea() {
         count: items.length,
         getScrollElement: () => scrollRef.current,
         // Estimate height per item — date separators ~32px, messages ~44px
-        estimateSize: (i) => items[i]?.type === "date" ? 32 : 44,
+        estimateSize: (i) => items[i]?.type === "date" ? 36 : 52,
         overscan: 10,   // render 10 extra items above/below viewport for smoothness
     });
 
@@ -355,7 +355,7 @@ export default function ChatArea() {
                     <button type='button' onClick={goBack} aria-label='Back to chats' className={'rounded-full p-1.5 md:hidden ' + (dark ? 'text-gray-300 hover:bg-white/5' : 'text-[#54656f] hover:bg-black/5')}><ChevronLeft size={19}/></button>
                     <button type='button' onClick={() => setShowContactInfo(value => !value)} className='flex min-w-0 items-center gap-3 text-left'>
                         <div className='relative shrink-0'><AvatarText name={data.name}/><span className={'absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 ' + (dark ? 'border-[#202c33]' : 'border-[#f0f2f5]') + (isOnline ? ' bg-emerald-500' : ' bg-gray-400')}/></div>
-                        <div className='min-w-0'><p className={'m-0 truncate text-sm font-medium ' + (dark ? 'text-white' : 'text-[#111b21]')}>{data.name}</p><p className={'m-0 text-xs ' + (HeTyping ? 'text-emerald-500' : dark ? 'text-gray-400' : 'text-[#667781]')}>{HeTyping ? 'typing…' : isOnline ? 'online' : 'offline'}</p></div>
+                        <div className='min-w-0'><p className={'m-0 truncate text-[15px] font-semibold ' + (dark ? 'text-white' : 'text-[#111b21]')}>{data.name}</p><p className={'m-0 text-[13px] ' + (HeTyping ? 'text-emerald-500' : dark ? 'text-gray-400' : 'text-[#667781]')}>{HeTyping ? 'typing…' : isOnline ? 'online' : 'offline'}</p></div>
                     </button>
                 </div>
                 <div className='flex shrink-0 items-center gap-1'>
@@ -422,7 +422,7 @@ export default function ChatArea() {
                                     >
                                         {item.type === "date" ? (
                                             <div className="flex justify-center py-2">
-                                                <span className={`text-[11px] px-3 py-1 rounded-full ${dark ? "bg-[#1e2230] text-gray-500" : "bg-gray-200 text-gray-500"}`}>
+                                                <span className={`text-xs px-3.5 py-1.5 rounded-full ${dark ? "bg-[#1e2230] text-gray-500" : "bg-gray-200 text-gray-500"}`}>
                                                     {item.label}
                                                 </span>
                                             </div>
@@ -440,7 +440,7 @@ export default function ChatArea() {
             </div>
 
             {/* Input */}
-            <div className={`border-t px-3 py-2.5 sm:px-4 ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
+            <div className={`border-t px-4 py-3 sm:px-5 ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
                 {(replyTo || editingMessage) && <div className={`mb-2 flex items-center justify-between gap-3 rounded-xl border-l-2 border-indigo-400 px-3 py-2 text-xs ${dark ? "bg-white/[0.04] text-gray-300" : "bg-indigo-50 text-gray-700"}`}>
                     <div className="flex min-w-0 items-center gap-2"><Reply size={14} className="flex-shrink-0 text-indigo-400"/><div className="min-w-0"><div className="font-semibold">{editingMessage ? "Editing message" : `Replying to ${replyTo?.sender?.name || "message"}`}</div><div className="truncate">{editingMessage ? editingMessage.content : (replyTo?.deletedAt ? "This message was deleted" : replyTo?.content)}</div></div></div>
                     <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); requestAnimationFrame(() => messageInputRef.current?.focus()); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
@@ -456,7 +456,7 @@ export default function ChatArea() {
                     disabled={sending}
                     onChange={handleTyping}
                     placeholder={editingMessage ? "Edit your message…" : "Type a message"}
-                    className={`flex-1 rounded-full border px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15
+                    className={`flex-1 rounded-full border px-4 py-3.5 text-[15px] outline-none transition focus:ring-2 focus:ring-emerald-500/15
                         ${dark
                             ? "bg-[#2a3942] border-transparent focus:border-emerald-500 text-white placeholder-gray-400"
                             : "bg-white border-transparent focus:border-emerald-300 text-[#111b21] placeholder-[#667781]"
@@ -465,7 +465,7 @@ export default function ChatArea() {
                 <button
                     onClick={handleSendMessage}
                     disabled={!messageText.trim() || sending}
-                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#00a884] shadow-sm transition-all hover:bg-[#008f72] disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#00a884] shadow-sm transition-all hover:bg-[#008f72] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     {sending ? <Loader2 size={15} className="animate-spin text-white" /> : editingMessage ? <span className="text-xs font-semibold text-white">Save</span> : <Send size={15} className="text-white" />}
                 </button>
