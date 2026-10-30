@@ -20,7 +20,7 @@ function Sent({ msg, onReply, onEdit, onDelete, isMenuOpen, onMenuOpenChange }) 
     const messageAge = Date.now() - new Date(msg.createdAt).getTime();
     const canEdit = Number.isFinite(messageAge) && messageAge >= 0 && messageAge <= 15 * 60 * 1000;
     const panelClass = `absolute right-0 ${openUpward ? "bottom-6" : "top-6"} z-[100] min-w-44 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
-    const menuItemClass = "flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10";
+    const menuItemClass = "flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-[15px] hover:bg-black/5 dark:hover:bg-white/10";
 
     return (
         <div className="flex justify-end my-1 mr-2">
@@ -33,13 +33,13 @@ function Sent({ msg, onReply, onEdit, onDelete, isMenuOpen, onMenuOpenChange }) 
                         {!deleted && canEdit && <button type="button" className={menuItemClass} onClick={() => { onEdit?.(msg); onMenuOpenChange?.(null); }}><Pencil size={15}/>Edit message</button>}
                         {!deleted && <button type="button" className={`${menuItemClass} text-red-500`} onClick={() => { onDelete?.(msg); onMenuOpenChange?.(null); }}><Trash2 size={15}/>Delete message</button>}
                     </div>}
-                    <div className={`relative px-3 py-2 rounded-2xl rounded-tr-sm ${dark ? "bg-[#005c4b]" : "bg-[#d9fdd3]"}`}>
+                    <div className={`relative px-3.5 py-2.5 rounded-2xl rounded-tr-sm ${dark ? "bg-[#005c4b]" : "bg-[#d9fdd3]"}`}>
                         {msg.replyTo && <div className={`mb-2 rounded-lg border-l-2 border-[#53bdeb] px-2 py-1 text-xs ${dark ? "bg-black/15 text-gray-300" : "bg-black/5 text-gray-600"}`}><div className="font-semibold">{msg.replyTo.sender?.name || "Reply"}</div><div className="truncate">{msg.replyTo.deletedAt ? "This message was deleted" : msg.replyTo.content}</div></div>}
                         <div className="flex items-end gap-2">
-                            <p className={`text-sm leading-relaxed break-words whitespace-pre-wrap min-w-0 flex-1 m-0 ${deleted ? "italic opacity-70" : ""} ${dark ? "text-white" : "text-[#111b21]"}`}>{deleted ? "This message was deleted" : msg.content}</p>
+                            <p className={`text-[15px] leading-relaxed break-words whitespace-pre-wrap min-w-0 flex-1 m-0 ${deleted ? "italic opacity-70" : ""} ${dark ? "text-white" : "text-[#111b21]"}`}>{deleted ? "This message was deleted" : msg.content}</p>
                             <div className="flex items-center gap-1 flex-shrink-0 self-end">
-                                {msg.editedAt && !deleted && <span className="text-[9px] opacity-60">edited</span>}
-                                <span className={`text-[10px] whitespace-nowrap ${dark ? "text-white/60" : "text-[#667781]"}`}>{timeOnly}</span>
+                                {msg.editedAt && !deleted && <span className="text-[10px] opacity-60">edited</span>}
+                                <span className={`text-[11px] whitespace-nowrap ${dark ? "text-white/60" : "text-[#667781]"}`}>{timeOnly}</span>
                                 <CheckCheck size={15} color={msg.isRead ? "#53bdeb" : dark ? "rgba(255,255,255,0.6)" : "#8696a0"} />
                             </div>
                         </div>
