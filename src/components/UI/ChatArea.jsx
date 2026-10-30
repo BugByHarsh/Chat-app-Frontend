@@ -390,7 +390,7 @@ export default function ChatArea() {
                 ref={scrollRef}
                 onScroll={handleScroll}
                 className={`flex-1 overflow-y-auto ${dark ? "bg-[#0b141a]" : "bg-[#efeae2]"}`}
-                style={{ backgroundImage: "url('/chat-wallpaper.svg')", backgroundRepeat: "repeat", backgroundSize: "374px 666px", backgroundBlendMode: "soft-light" }}
+                style={{ backgroundImage: "url('/chat-wallpaper.svg')", backgroundRepeat: "repeat", backgroundSize: "374px 666px" }}
             >
                 {initialLoading ? (
                     <div className="flex items-center justify-center h-full">
