@@ -55,6 +55,7 @@ export default function ChatArea() {
     const [initialLoading, setInitialLoading] = useState(true);
 
     const [messageText, setMessageText] = useState("");
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [sending, setSending] = useState(false);
     const [sendError, setSendError] = useState("");
     const [replyTo, setReplyTo] = useState(null);
@@ -304,6 +305,19 @@ export default function ChatArea() {
         }
     }
 
+    function insertEmoji(emoji) {
+        const input = messageInputRef.current;
+        const start = input?.selectionStart ?? messageText.length;
+        const end = input?.selectionEnd ?? messageText.length;
+        const nextText = messageText.slice(0, start) + emoji + messageText.slice(end);
+        setMessageText(nextText);
+        setShowEmojiPicker(false);
+        requestAnimationFrame(() => {
+            input?.focus();
+            input?.setSelectionRange(start + emoji.length, start + emoji.length);
+        });
+    }
+
     function handleTyping(e) {
         setMessageText(e.target.value);
         if (sendError) setSendError("");
@@ -447,28 +461,30 @@ export default function ChatArea() {
                 </div>}
                 {sendError && <p role="alert" className="mb-2 text-xs text-red-400">{sendError}</p>}
                 <div className="flex items-center gap-3">
-                <input
-                    ref={messageInputRef}
-                    type="text"
-                    value={messageText}
-                    autoFocus
-                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                    disabled={sending}
-                    onChange={handleTyping}
-                    placeholder={editingMessage ? "Edit your message…" : "Type a message"}
-                    className={`flex-1 rounded-full border px-4 py-3.5 text-base font-medium outline-none transition focus:ring-2 focus:ring-emerald-500/15
-                        ${dark
-                            ? "bg-[#2a3942] border-transparent focus:border-emerald-500 text-white placeholder-gray-400"
-                            : "bg-white border-transparent focus:border-emerald-300 text-[#111b21] placeholder-[#667781]"
-                        }`}
-                />
-                <button
-                    onClick={handleSendMessage}
-                    disabled={!messageText.trim() || sending}
-                    className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#00a884] shadow-sm transition-all hover:bg-[#008f72] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                    {sending ? <Loader2 size={15} className="animate-spin text-white" /> : editingMessage ? <span className="text-xs font-semibold text-white">Save</span> : <Send size={15} className="text-white" />}
-                </button>
+                    <div className={`relative flex min-w-0 flex-1 items-center gap-2 rounded-full px-3.5 py-1.5 ${dark ? "bg-[#2a3942]" : "bg-white"}`}>
+                        {showEmojiPicker && <div className={`absolute bottom-[calc(100%+12px)] left-0 z-50 grid w-[min(320px,calc(100vw-48px))] grid-cols-8 gap-1 rounded-2xl border p-3 shadow-xl ${dark ? "border-white/10 bg-[#202c33]" : "border-[#e9edef] bg-white"}`}>
+                            {["😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤔","🤗","😭","🥹","😢","😡","👍","👎","👏","🙏","❤️","💕","🔥","🎉","💯","✨","💀","🤝","🙌","💪","👀","💬","☕","🌹","🥳","😴","🤦","🤷","😏","🫡"].map((emoji) => <button key={emoji} type="button" onClick={() => insertEmoji(emoji)} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xl transition hover:scale-110 ${dark ? "hover:bg-white/10" : "hover:bg-gray-100"}`} aria-label={`Insert ${emoji}`}>{emoji}</button>)}
+                        </div>}
+                        <button type="button" onClick={() => setShowEmojiPicker(value => !value)} aria-label="Open emoji keyboard" aria-expanded={showEmojiPicker} className={`flex h-9 w-8 flex-shrink-0 items-center justify-center rounded-full transition ${dark ? "text-gray-300 hover:bg-white/10" : "text-[#54656f] hover:bg-black/5"}`}><Smile size={21}/></button>
+                        <input
+                            ref={messageInputRef}
+                            type="text"
+                            value={messageText}
+                            autoFocus
+                            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
+                            disabled={sending}
+                            onChange={handleTyping}
+                            placeholder={editingMessage ? "Edit your message…" : "Type a message"}
+                            className={`min-w-0 flex-1 border-0 bg-transparent px-1 py-3 text-base font-medium outline-none focus:outline-none focus:ring-0 ${dark ? "text-white placeholder-gray-400" : "text-[#111b21] placeholder-[#667781]"}`}
+                        />
+                    </div>
+                    <button
+                        onClick={handleSendMessage}
+                        disabled={!messageText.trim() || sending}
+                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[#00a884] shadow-sm transition-all hover:bg-[#008f72] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        {sending ? <Loader2 size={15} className="animate-spin text-white" /> : editingMessage ? <span className="text-xs font-semibold text-white">Save</span> : <Send size={15} className="text-white" />}
+                    </button>
                 </div>
             </div>
             {showDeleteChatConfirm && <div className='absolute inset-0 z-[80] flex items-center justify-center bg-black/45 p-4' onClick={() => setShowDeleteChatConfirm(false)}>
