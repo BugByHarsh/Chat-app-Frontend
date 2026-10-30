@@ -70,6 +70,7 @@ export default function ChatArea() {
     const [HeTyping, setHeTyping] = useState(false);
     const timer = useRef(null);
     const scrollRef = useRef(null);
+    const messageInputRef = useRef(null);
 
     // Only one message menu may be open. Any click outside its trigger/menu closes it.
     useEffect(() => {
@@ -241,7 +242,10 @@ export default function ChatArea() {
                 setReplyTo(null);
                 setEditingMessage(null);
                 setSendError("");
-                requestAnimationFrame(() => scrollToBottom());
+                requestAnimationFrame(() => {
+                    scrollToBottom();
+                    messageInputRef.current?.focus();
+                });
             }
         } catch (error) {
             setSendError(error.response?.data?.message || (editingMessage ? "Couldn't edit the message. Please try again." : "Couldn't send the message. Your text is still here—please try again."));
@@ -434,11 +438,12 @@ export default function ChatArea() {
             <div className={`border-t px-3 py-2.5 sm:px-4 ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
                 {(replyTo || editingMessage) && <div className={`mb-2 flex items-center justify-between gap-3 rounded-xl border-l-2 border-indigo-400 px-3 py-2 text-xs ${dark ? "bg-white/[0.04] text-gray-300" : "bg-indigo-50 text-gray-700"}`}>
                     <div className="flex min-w-0 items-center gap-2"><Reply size={14} className="flex-shrink-0 text-indigo-400"/><div className="min-w-0"><div className="font-semibold">{editingMessage ? "Editing message" : `Replying to ${replyTo?.sender?.name || "message"}`}</div><div className="truncate">{editingMessage ? editingMessage.content : (replyTo?.deletedAt ? "This message was deleted" : replyTo?.content)}</div></div></div>
-                    <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
+                    <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); requestAnimationFrame(() => messageInputRef.current?.focus()); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
                 </div>}
                 {sendError && <p role="alert" className="mb-2 text-xs text-red-400">{sendError}</p>}
                 <div className="flex items-center gap-3">
                 <input
+                    ref={messageInputRef}
                     type="text"
                     value={messageText}
                     autoFocus
