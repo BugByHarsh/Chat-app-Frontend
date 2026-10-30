@@ -1,14 +1,23 @@
 import { useSelector } from "react-redux";
 import { Reply, ChevronDown, Copy } from "lucide-react";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 
 function Recv({ msg, onReply, isMenuOpen, onMenuOpenChange }) {
     const dark = useSelector((state) => state.theme.dark);
     const [hovered, setHovered] = useState(false);
+    const [openUpward, setOpenUpward] = useState(false);
+    const menuRef = useRef(null);
+    useLayoutEffect(() => {
+        if (!isMenuOpen || !menuRef.current) return;
+        const menuRect = menuRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - menuRect.top;
+        const spaceAbove = menuRect.bottom;
+        setOpenUpward(spaceBelow < menuRect.height + 12 && spaceAbove > menuRect.height + 12);
+    }, [isMenuOpen]);
     const time = new Date(msg.createdAt);
     const timeOnly = Number.isNaN(time.getTime()) ? "" : time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const deleted = Boolean(msg.deletedAt);
-    const panelClass = `absolute left-0 top-6 z-[100] min-w-40 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
+    const panelClass = `absolute left-0 ${openUpward ? "bottom-6" : "top-6"} z-[100] min-w-40 overflow-hidden rounded-xl border py-1 shadow-xl ${dark ? "border-white/10 bg-[#202c33] text-gray-100" : "border-gray-200 bg-white text-gray-800"}`;
     const menuItemClass = "flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10";
 
     return (
@@ -16,7 +25,7 @@ function Recv({ msg, onReply, isMenuOpen, onMenuOpenChange }) {
             <div className="relative max-w-[85%] sm:max-w-[70%] min-w-0" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 <div className="relative">
                     <button type="button" data-message-menu="true" title="Message menu" aria-label="Message menu" onClick={(e) => { e.stopPropagation(); onMenuOpenChange?.(isMenuOpen ? null : String(msg._id)); }} className={`absolute right-1 top-1 z-20 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-150 ${dark ? "text-gray-200 hover:bg-white/10" : "text-gray-600 hover:bg-black/5"} ${hovered || isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}><ChevronDown size={16}/></button>
-                    {isMenuOpen && <div data-message-menu="true" onClick={(e) => e.stopPropagation()} className={panelClass}>
+                    {isMenuOpen && <div ref={menuRef} data-message-menu="true" onClick={(e) => e.stopPropagation()} className={panelClass}>
                         <button type="button" className={menuItemClass} onClick={() => { onReply?.(msg); onMenuOpenChange?.(null); }}><Reply size={15}/>Reply</button>
                         <button type="button" className={menuItemClass} onClick={async () => { try { await navigator.clipboard.writeText(msg.content || ""); } catch {} onMenuOpenChange?.(null); }}><Copy size={15}/>Copy</button>
                     </div>}
