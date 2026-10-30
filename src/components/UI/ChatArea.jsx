@@ -455,14 +455,14 @@ export default function ChatArea() {
             </div>
 
             {/* Input */}
-            <div className={`border-t px-4 py-3 sm:px-5 ${dark ? "bg-[#202c33] border-white/[0.06]" : "bg-[#f0f2f5] border-[#e9edef]"}`}>
+            <div className={`border-t px-4 py-3 sm:px-5 ${dark ? "bg-transparent border-white/[0.06]" : "bg-transparent border-transparent"}`}>
                 {(replyTo || editingMessage) && <div className={`mb-2 flex items-center justify-between gap-3 rounded-xl border-l-2 border-indigo-400 px-3 py-2 text-xs ${dark ? "bg-white/[0.04] text-gray-300" : "bg-indigo-50 text-gray-700"}`}>
                     <div className="flex min-w-0 items-center gap-2"><Reply size={14} className="flex-shrink-0 text-indigo-400"/><div className="min-w-0"><div className="font-semibold">{editingMessage ? "Editing message" : `Replying to ${replyTo?.sender?.name || "message"}`}</div><div className="truncate">{editingMessage ? editingMessage.content : (replyTo?.deletedAt ? "This message was deleted" : replyTo?.content)}</div></div></div>
                     <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); requestAnimationFrame(() => messageInputRef.current?.focus()); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
                 </div>}
                 {sendError && <p role="alert" className="mb-2 text-xs text-red-400">{sendError}</p>}
                 <div className="flex items-center gap-3">
-                    <div className={`relative flex min-w-0 flex-1 items-center gap-2 rounded-full px-3.5 py-1.5 ${dark ? "bg-[#2a3942]" : "bg-white"}`}>
+                    <div className="relative flex min-w-0 flex-1 items-center gap-2 rounded-full bg-transparent px-3.5 py-1.5">
                         {showEmojiPicker && <div className={`absolute bottom-[calc(100%+12px)] left-0 z-50 grid w-[min(320px,calc(100vw-48px))] grid-cols-8 gap-1 rounded-2xl border p-3 shadow-xl ${dark ? "border-white/10 bg-[#202c33]" : "border-[#e9edef] bg-white"}`}>
                             {["😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤔","🤗","😭","🥹","😢","😡","👍","👎","👏","🙏","❤️","💕","🔥","🎉","💯","✨","💀","🤝","🙌","💪","👀","💬","☕","🌹","🥳","😴","🤦","🤷","😏","🫡"].map((emoji) => <button key={emoji} type="button" onClick={() => insertEmoji(emoji)} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xl transition hover:scale-110 ${dark ? "hover:bg-white/10" : "hover:bg-gray-100"}`} aria-label={`Insert ${emoji}`}>{emoji}</button>)}
                         </div>}
