@@ -455,7 +455,7 @@ export default function ChatArea() {
             </div>
 
             {/* Input */}
-            <div className={`border-t px-4 py-3 sm:px-5 ${dark ? "bg-transparent border-white/[0.06]" : "bg-transparent border-transparent"}`}>
+            <div className={`border-t px-4 py-3 sm:px-5 ${dark ? "bg-[#0b141a] border-white/[0.06]" : "bg-[#efeae2] border-transparent"}`} style={{ backgroundImage: "url('/chat-wallpaper.svg?v=2')", backgroundRepeat: "repeat", backgroundSize: "374px 666px" }}>
                 {(replyTo || editingMessage) && <div className={`mb-2 flex items-center justify-between gap-3 rounded-xl border-l-2 border-indigo-400 px-3 py-2 text-xs ${dark ? "bg-white/[0.04] text-gray-300" : "bg-indigo-50 text-gray-700"}`}>
                     <div className="flex min-w-0 items-center gap-2"><Reply size={14} className="flex-shrink-0 text-indigo-400"/><div className="min-w-0"><div className="font-semibold">{editingMessage ? "Editing message" : `Replying to ${replyTo?.sender?.name || "message"}`}</div><div className="truncate">{editingMessage ? editingMessage.content : (replyTo?.deletedAt ? "This message was deleted" : replyTo?.content)}</div></div></div>
                     <button type="button" aria-label="Cancel reply or edit" onClick={() => { setReplyTo(null); setEditingMessage(null); requestAnimationFrame(() => messageInputRef.current?.focus()); }} className="rounded-md p-1 hover:bg-black/10"><X size={14}/></button>
