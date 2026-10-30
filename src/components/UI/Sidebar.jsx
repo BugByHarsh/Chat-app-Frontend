@@ -158,7 +158,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                     <input
                         type="text" aria-label="Filter conversations" placeholder={activeSection === 'groups' ? 'Search groups' : 'Search chats'} value={filter}
                         onChange={e => setFilter(e.target.value)}
-                        className={`w-full rounded-full border py-3 pl-10 pr-3 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15 ${inputBg}`}
+                        className={`w-full rounded-full border py-3.5 pl-10 pr-3 text-[15px] font-medium outline-none transition focus:ring-2 focus:ring-emerald-500/15 ${inputBg}`}
                     />
                 </div>
             </div>
@@ -166,13 +166,13 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
             <div className="flex items-center gap-2 overflow-x-auto px-4 py-3.5">
                 {[{id:'all',label:'All'},{id:'unread',label:'Unread'},{id:'favorites',label:'Favorites'},{id:'groups',label:'Groups'}].map(tab => (
                     <button key={tab.id} type="button" onClick={() => { if (tab.id === 'groups') { setActiveSection('groups'); setListFilter('all'); } else { setActiveSection('chats'); setListFilter(tab.id); } }}
-                        className={'shrink-0 rounded-full border px-3.5 py-2 text-[13px] transition-colors ' + ((tab.id === 'groups' ? activeSection === 'groups' : activeSection === 'chats' && listFilter === tab.id) ? (dark ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-300' : 'border-[#d0f0e2] bg-[#d9fdd3] text-[#176b52]') : (dark ? 'border-white/10 text-gray-400 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'))}>{tab.label}</button>
+                        className={'shrink-0 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors ' + ((tab.id === 'groups' ? activeSection === 'groups' : activeSection === 'chats' && listFilter === tab.id) ? (dark ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-300' : 'border-[#d0f0e2] bg-[#d9fdd3] text-[#176b52]') : (dark ? 'border-white/10 text-gray-400 hover:bg-white/5' : 'border-gray-300 text-gray-600 hover:bg-gray-50'))}>{tab.label}</button>
                 ))}
                 <button type="button" title="New conversation" onClick={() => setSearchOpen(true)} className={'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ' + (dark ? 'border-white/10 text-gray-400' : 'border-gray-300 text-gray-600')}><Plus size={17}/></button>
             </div>
             <div className="flex-1 overflow-y-auto">
                 {filteredChats?.length === 0 && (
-                    <p className={`text-center text-xs mt-8 ${dark ? 'text-gray-600' : 'text-gray-400'}`}>{activeSection === 'groups' ? 'No groups yet. Group conversations will appear here.' : 'No conversations yet. Start a chat with someone new.'}</p>
+                    <p className={`text-center text-sm font-medium mt-8 ${dark ? 'text-gray-600' : 'text-gray-400'}`}>{activeSection === 'groups' ? 'No groups yet. Group conversations will appear here.' : 'No conversations yet. Start a chat with someone new.'}</p>
                 )}
                 {filteredChats?.map((chat, index) => (
                     <motion.div key={chat._id || index}
@@ -198,7 +198,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className={`text-sm font-semibold ${dark ? 'text-white' : 'text-gray-900'}`}>New conversation</h3>
+                                <h3 className={`text-base font-semibold ${dark ? 'text-white' : 'text-gray-900'}`}>New conversation</h3>
                                 <button onClick={() => setSearchOpen(false)} aria-label="Close new conversation"
                                     className={`p-1 rounded-lg ${dark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}>
                                     <X size={15} />
@@ -211,7 +211,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                                     <input
                                         type="text" placeholder="Username or email…" value={name} autoFocus required
                                         onChange={e => setName(e.target.value)}
-                                        className={`w-full text-sm rounded-lg pl-8 pr-3 py-2 border outline-none transition-colors ${inputBg}`}
+                                        className={`w-full text-[15px] font-medium rounded-lg pl-8 pr-3 py-2 border outline-none transition-colors ${inputBg}`}
                                     />
                                 </div>
                                 <button type="submit"
@@ -233,9 +233,9 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
                                     <AvatarText name={searchResult.name} />
                                     <div className="flex-1 min-w-0">
                                         <p className={`text-sm font-medium ${dark ? 'text-white' : 'text-gray-900'}`}>{searchResult.name}</p>
-                                        <p className="text-xs text-gray-500">@{searchResult.username}</p>
+                                        <p className="text-[13px] font-medium text-gray-600">@{searchResult.username}</p>
                                     </div>
-                                    <span className="text-blue-400 text-xs font-medium">Open →</span>
+                                    <span className="text-blue-500 text-sm font-semibold">Open →</span>
                                 </motion.div>
                             )}
                         </motion.div>
