@@ -92,7 +92,7 @@ export default function Profile() {
                     className={`p-1.5 rounded-lg md:hidden ${dark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:bg-gray-100'}`}>
                     <ChevronLeft size={18} />
                 </button>
-                <span className={`text-base font-medium flex-1 ${dark ? 'text-white' : 'text-[#111b21]'}`}>Profile</span>
+                <span className={`text-lg font-semibold flex-1 ${dark ? 'text-white' : 'text-[#111b21]'}`}>Profile</span>
                 {isEditing && (
                     <button onClick={handleSave}
                         className="bg-[#00a884] hover:bg-[#008f72] text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors">
@@ -105,10 +105,10 @@ export default function Profile() {
                 {/* Avatar section */}
                 <div className={`flex flex-col items-center py-10 px-6 border-b ${dark ? 'bg-[#111b21] border-white/10' : 'bg-white border-[#e9edef]'}`}>
                     <AvatarText name={userData.name || '?'} profile={true} />
-                    <h2 className={`text-xl font-medium mt-4 mb-1 tracking-tight ${dark ? 'text-white' : 'text-[#111b21]'}`}>
+                    <h2 className={`text-2xl font-semibold mt-4 mb-1 tracking-tight ${dark ? 'text-white' : 'text-[#111b21]'}`}>
                         {userData.name}
                     </h2>
-                    <p className="text-sm text-gray-500">@{userData.username}</p>
+                    <p className="text-[15px] font-medium text-gray-600">@{userData.username}</p>
                 </div>
 
                 {/* Fields */}
@@ -121,17 +121,17 @@ export default function Profile() {
                         <div key={field} className={`flex items-center gap-3 py-4 border-b ${borderClass}`}>
                             <span className="text-gray-500 flex-shrink-0">{icon}</span>
                             <div className="flex-1 min-w-0">
-                                <p className="text-gray-500 text-xs font-medium mb-0.5">{label}</p>
+                                <p className="text-gray-600 text-sm font-semibold mb-0.5">{label}</p>
                                 {editing[field] ? (
                                     <input
                                         autoFocus
                                         value={newUserData[field] || ''}
                                         onChange={e => setNewUserData(p => ({ ...p, [field]: e.target.value }))}
-                                        className={`text-sm w-full rounded-lg px-3 py-2 outline-none border transition-colors
+                                        className={`text-[15px] font-medium w-full rounded-lg px-3 py-2 outline-none border transition-colors
                                             ${dark ? 'bg-[#202c33] border-white/10 focus:border-emerald-500 text-white' : 'bg-[#f7f8fa] border-[#d1d7db] focus:border-emerald-500 text-[#111b21]'}`}
                                     />
                                 ) : (
-                                    <p className={`text-sm truncate ${dark ? 'text-gray-200' : 'text-gray-800'}`}>{value}</p>
+                                    <p className={`text-[15px] font-medium truncate ${dark ? 'text-gray-200' : 'text-gray-800'}`}>{value}</p>
                                 )}
                             </div>
                             <div className="flex-shrink-0">
