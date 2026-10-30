@@ -422,7 +422,7 @@ export default function ChatArea() {
                                     >
                                         {item.type === "date" ? (
                                             <div className="flex justify-center py-2">
-                                                <span className={`text-xs px-3.5 py-1.5 rounded-full ${dark ? "bg-[#1e2230] text-gray-500" : "bg-gray-200 text-gray-500"}`}>
+                                                <span className={`text-[13px] font-semibold px-3.5 py-1.5 rounded-full ${dark ? "bg-[#1e2230] text-gray-500" : "bg-gray-200 text-gray-500"}`}>
                                                     {item.label}
                                                 </span>
                                             </div>
@@ -456,7 +456,7 @@ export default function ChatArea() {
                     disabled={sending}
                     onChange={handleTyping}
                     placeholder={editingMessage ? "Edit your message…" : "Type a message"}
-                    className={`flex-1 rounded-full border px-4 py-3.5 text-[15px] outline-none transition focus:ring-2 focus:ring-emerald-500/15
+                    className={`flex-1 rounded-full border px-4 py-3.5 text-base font-medium outline-none transition focus:ring-2 focus:ring-emerald-500/15
                         ${dark
                             ? "bg-[#2a3942] border-transparent focus:border-emerald-500 text-white placeholder-gray-400"
                             : "bg-white border-transparent focus:border-emerald-300 text-[#111b21] placeholder-[#667781]"
