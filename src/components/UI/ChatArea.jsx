@@ -88,6 +88,15 @@ export default function ChatArea() {
     const onlineUsers = useSelector((state) => state.online);
     const isOnline = onlineUsers.some((id) => String(id?._id ?? id) === String(data.Rid));
     const currentUserId = String(safeGetUser()?._id ?? "");
+    useEffect(() => {
+        const onChatDeletedForEveryone = ({ chatId }) => {
+            if (String(chatId) !== String(data.id)) return;
+            dispatch(chatActions.removeChat(String(chatId)));
+            navigateTo("/app");
+        };
+        socket.on("chatDeletedForEveryone", onChatDeletedForEveryone);
+        return () => socket.off("chatDeletedForEveryone", onChatDeletedForEveryone);
+    }, [data.id, dispatch, navigateTo]);
     useEffect(() => { try { setIsFavorite(JSON.parse(localStorage.getItem("weConvoFavorites") || "[]").includes(String(data.id))); } catch { setIsFavorite(false); } }, [data.id]);
     function toggleChatFavorite() { let saved = []; try { saved = JSON.parse(localStorage.getItem("weConvoFavorites") || "[]"); } catch {} const next = saved.includes(String(data.id)) ? saved.filter(id => id !== String(data.id)) : [...saved, String(data.id)]; localStorage.setItem("weConvoFavorites", JSON.stringify(next)); setIsFavorite(next.includes(String(data.id))); setShowChatMenu(false); }
     async function deleteChatForMe() {
