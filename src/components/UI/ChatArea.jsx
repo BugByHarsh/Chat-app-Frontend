@@ -178,7 +178,7 @@ export default function ChatArea() {
     useEffect(() => {
         if (hydratedChatId.current !== String(data.id)) return;
         dispatch(messageActions.cacheMessages({ chatId: data.id, messages: msgs, hasMore }));
-    }, [data.id, msgs, hasMore, dispatch]);
+    }, [msgs, hasMore, dispatch]);
 
     // Load older messages (triggered by scrolling to top)
     async function loadMore() {
