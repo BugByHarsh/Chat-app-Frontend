@@ -35,16 +35,9 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
         if (localStorage.getItem('token') && !socket.connected) socket.connect();
 
         const setData = (data) => {
-            const incomingChatId = String(data?.chatId?._id ?? data?.chatId ?? "");
-            if (incomingChatId) {
-                try {
-                    const hidden = JSON.parse(localStorage.getItem('weConvoHiddenChats') || '[]');
-                    if (hidden.includes(incomingChatId)) {
-                        localStorage.setItem('weConvoHiddenChats', JSON.stringify(hidden.filter(id => String(id) !== incomingChatId)));
-                    }
-                } catch (_) {}
-            }
             dispatch(chatActions.updateChat(data));
+            // Refresh so a chat restored by an incoming message is inserted into Redux.
+            loadChats();
         };
         const onNewChat = (newChat) => dispatch(chatActions.appendChat(newChat));
         socket.on('newChat', onNewChat);
@@ -107,9 +100,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
         }
     }
 
-    const hiddenChatIds = (() => { try { return JSON.parse(localStorage.getItem('weConvoHiddenChats') || '[]'); } catch { return []; } })();
     const filteredChats = chatData?.filter(chat => {
-        if (hiddenChatIds.includes(String(chat._id))) return false;
         const users = Array.isArray(chat.users) ? chat.users : [];
         const isGroup = users.length > 2;
         if (activeSection === 'groups' && !isGroup) return false;
