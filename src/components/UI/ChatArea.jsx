@@ -63,6 +63,8 @@ export default function ChatArea() {
     const [openMessageMenuId, setOpenMessageMenuId] = useState(null);
     const [showChatMenu, setShowChatMenu] = useState(false);
     const [showDeleteChatConfirm, setShowDeleteChatConfirm] = useState(false);
+    const [deletingChat, setDeletingChat] = useState(false);
+    const [deleteChatError, setDeleteChatError] = useState("");
     const [showContactInfo, setShowContactInfo] = useState(false);
     const [showCallPrompt, setShowCallPrompt] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
@@ -88,7 +90,30 @@ export default function ChatArea() {
     const currentUserId = String(safeGetUser()?._id ?? "");
     useEffect(() => { try { setIsFavorite(JSON.parse(localStorage.getItem("weConvoFavorites") || "[]").includes(String(data.id))); } catch { setIsFavorite(false); } }, [data.id]);
     function toggleChatFavorite() { let saved = []; try { saved = JSON.parse(localStorage.getItem("weConvoFavorites") || "[]"); } catch {} const next = saved.includes(String(data.id)) ? saved.filter(id => id !== String(data.id)) : [...saved, String(data.id)]; localStorage.setItem("weConvoFavorites", JSON.stringify(next)); setIsFavorite(next.includes(String(data.id))); setShowChatMenu(false); }
-    function deleteChatForMe() { let hidden = []; let favorites = []; try { hidden = JSON.parse(localStorage.getItem("weConvoHiddenChats") || "[]"); } catch {} try { favorites = JSON.parse(localStorage.getItem("weConvoFavorites") || "[]"); } catch {} const chatId = String(data.id); if (!hidden.includes(chatId)) localStorage.setItem("weConvoHiddenChats", JSON.stringify([...hidden, chatId])); localStorage.setItem("weConvoFavorites", JSON.stringify(favorites.filter(id => String(id) !== chatId))); setIsFavorite(false); setShowDeleteChatConfirm(false); setShowChatMenu(false); navigateTo("/app"); }
+    async function deleteChatForMe() {
+        if (deletingChat) return;
+        setDeletingChat(true);
+        setDeleteChatError("");
+        const chatId = String(data.id);
+        try {
+            await axios.delete(
+                `${import.meta.env.VITE_API_URL}/chat/api/${chatId}`,
+                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+            );
+            let favorites = [];
+            try { favorites = JSON.parse(localStorage.getItem("weConvoFavorites") || "[]"); } catch {}
+            localStorage.setItem("weConvoFavorites", JSON.stringify(favorites.filter(id => String(id) !== chatId)));
+            dispatch(chatActions.removeChat(chatId));
+            setIsFavorite(false);
+            setShowDeleteChatConfirm(false);
+            setShowChatMenu(false);
+            navigateTo("/app");
+        } catch (error) {
+            setDeleteChatError(error.response?.data?.message || "Couldn't delete this chat. Please try again.");
+        } finally {
+            setDeletingChat(false);
+        }
+    }
 
     const scrollToBottom = useCallback(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -492,8 +517,9 @@ export default function ChatArea() {
                 <section role='dialog' aria-modal='true' aria-labelledby='delete-chat-title' onClick={event => event.stopPropagation()} className={'w-full max-w-sm rounded-2xl p-6 shadow-2xl ' + (dark ? 'bg-[#202c33] text-white' : 'bg-white text-[#111b21]')}>
                     <div className='mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-red-500/10 text-red-500'><Trash2 size={21}/></div>
                     <h2 id='delete-chat-title' className='text-lg font-semibold'>Delete this chat?</h2>
-                    <p className={'mt-2 text-sm leading-6 ' + (dark ? 'text-gray-300' : 'text-[#667781]')}>This removes the conversation from your We-Convo chat list on this device. It does not delete the other person's copy or erase messages from the server.</p>
-                    <div className='mt-5 flex justify-end gap-2'><button type='button' onClick={() => setShowDeleteChatConfirm(false)} className={'rounded-full border px-4 py-2.5 text-sm font-medium ' + (dark ? 'border-white/15 hover:bg-white/5' : 'border-[#d1d7db] hover:bg-gray-50')}>Cancel</button><button type='button' onClick={deleteChatForMe} className='rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700'>Delete chat</button></div>
+                    <p className={'mt-2 text-sm leading-6 ' + (dark ? 'text-gray-300' : 'text-[#667781]')}>This removes the conversation from your chat list. The other participants will still have their copy, and the conversation can reappear if you receive a new message.</p>
+                    {deleteChatError && <p role='alert' className='mt-3 text-sm text-red-500'>{deleteChatError}</p>}
+                    <div className='mt-5 flex justify-end gap-2'><button type='button' onClick={() => setShowDeleteChatConfirm(false)} className={'rounded-full border px-4 py-2.5 text-sm font-medium ' + (dark ? 'border-white/15 hover:bg-white/5' : 'border-[#d1d7db] hover:bg-gray-50')}>Cancel</button><button type='button' onClick={deleteChatForMe} disabled={deletingChat} className='rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60'>{deletingChat ? "Deleting…" : "Delete chat"}</button></div>
                 </section>
             </div>}
             {showCallPrompt && <div className='absolute inset-0 z-[70] flex items-center justify-center bg-black/40 p-4' onClick={() => setShowCallPrompt(false)}>
