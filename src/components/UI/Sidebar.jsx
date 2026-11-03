@@ -40,6 +40,8 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
             loadChats();
         };
         const onNewChat = (newChat) => dispatch(chatActions.appendChat(newChat));
+        const onChatDeletedForEveryone = ({ chatId }) => dispatch(chatActions.removeChat(String(chatId)));
+        socket.on('chatDeletedForEveryone', onChatDeletedForEveryone);
         socket.on('newChat', onNewChat);
         socket.on('newMessage', setData);
 
@@ -47,6 +49,7 @@ export default function SideBar({ activeSection = 'chats', setActiveSection = ()
 
         return () => {
             socket.off('newChat', onNewChat);
+            socket.off('chatDeletedForEveryone', onChatDeletedForEveryone);
             socket.off('newMessage', setData);
             socket.disconnect();
         };
