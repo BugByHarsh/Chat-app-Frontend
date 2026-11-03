@@ -12,6 +12,7 @@ import Recv from "../Chat/Recv";
 import { socket } from "../../Utils/socket";
 import AvatarText from "../miscellaneous/AvatarText";
 import { chatActions } from "../../store/ChatSlice";
+import { messageActions } from "../../store/MessageSlice";
 
 const idOf = (value) => value == null ? "" : String(value._id ?? value);
 
@@ -49,8 +50,10 @@ export default function ChatArea() {
     const navigateTo = useNavigate();
 
     // msgs stored newest-first (prepend older, append newer)
-    const [msgs, setMsgs] = useState([]);
-    const [hasMore, setHasMore] = useState(false);
+    const cachedConversation = useSelector((state) => state.messages?.[String(data.id)]);
+    const hydratedChatId = useRef(null);
+    const [msgs, setMsgs] = useState(() => cachedConversation?.messages || []);
+    const [hasMore, setHasMore] = useState(() => cachedConversation?.hasMore || false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
 
@@ -143,24 +146,26 @@ export default function ChatArea() {
     useEffect(() => {
         controls.set("initial");
         controls.start("fadein");
-        setMsgs([]);
+        hydratedChatId.current = String(data.id);
+        setMsgs(cachedConversation?.messages || []);
         setReplyTo(null);
         setEditingMessage(null);
         setOpenMessageMenuId(null);
-        setHasMore(false);
-        setInitialLoading(true);
+        setHasMore(cachedConversation?.hasMore || false);
+        setInitialLoading(!cachedConversation?.loaded);
         setLoadError("");
 
         socket.emit("msgsRead", { chatId: data.id });
         dispatch(chatActions.markChatRead({ chatId: data.id, userId: currentUserId }));
 
         let cancelled = false;
+        if (cachedConversation?.loaded) requestAnimationFrame(() => scrollToBottom());
         fetchMessages(data.id).then(({ messages, hasMore }) => {
             if (cancelled) return;
             setMsgs(messages);
             setHasMore(hasMore);
             setInitialLoading(false);
-            requestAnimationFrame(() => scrollToBottom());
+            if (!cachedConversation?.loaded) requestAnimationFrame(() => scrollToBottom());
         }).catch(() => {
             if (cancelled) return;
             setLoadError("Couldn't load this conversation. Check your connection and try again.");
@@ -168,6 +173,12 @@ export default function ChatArea() {
         });
         return () => { cancelled = true; };
     }, [data.id, data.Rid, currentUserId, controls, dispatch, fetchMessages, scrollToBottom]);
+
+    // Persist every message-list change so revisiting a chat can render from cache.
+    useEffect(() => {
+        if (hydratedChatId.current !== String(data.id)) return;
+        dispatch(messageActions.cacheMessages({ chatId: data.id, messages: msgs, hasMore }));
+    }, [data.id, msgs, hasMore, dispatch]);
 
     // Load older messages (triggered by scrolling to top)
     async function loadMore() {
