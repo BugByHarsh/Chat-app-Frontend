@@ -56,6 +56,10 @@ const chatSlice = createSlice({
         latest.isRead = true;
       }
     },
+    removeChat(state, action) {
+      const chatId = idOf(action.payload);
+      return state.filter((chat) => idOf(chat._id) !== chatId);
+    },
     appendChat(state, action) {
       const chat = action.payload;
       const exists = state.some((item) => idOf(item._id) === idOf(chat?._id));
